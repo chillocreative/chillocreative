@@ -1,0 +1,105 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* WordPress Content Styling - Refined */
+.wp-content {
+  font-size: 1.125rem;
+  line-height: 1.8;
+}
+
+.wp-content h1,
+.wp-content h2,
+.wp-content h3,
+.wp-content h4 {
+  font-weight: 800;
+  margin-top: 3rem;
+  margin-bottom: 1.5rem;
+  color: white;
+  line-height: 1.2;
+}
+
+.wp-content h2 {
+  font-size: 2.5rem;
+}
+
+.wp-content h3 {
+  font-size: 2rem;
+}
+
+.wp-content p {
+  margin-bottom: 2rem;
+  line-height: 1.8;
+  color: #9ca3af;
+  /* gray-400 */
+}
+
+/* Ensure bullet points are visible and styled */
+.wp-content ul {
+  list-style-type: disc !important;
+  list-style-position: outside !important;
+  margin-bottom: 2rem;
+  padding-left: 2rem !important;
+}
+
+.wp-content ol {
+  list-style-type: decimal !important;
+  list-style-position: outside !important;
+  margin-bottom: 2rem;
+  padding-left: 2rem !important;
+}
+
+.wp-content li {
+  margin-bottom: 1rem;
+  line-height: 1.6;
+  color: #9ca3af;
+  display: list-item !important;
+  /* Force display as list item */
+}
+
+.wp-content strong,
+.wp-content b {
+  color: #ffffff;
+  font-weight: 800;
+}
+
+/* Direct match for the "Quote" style in the editor */
+.wp-content blockquote,
+.wp-content .wp-block-quote {
+  border-left: 2px solid #525252;
+  /* subtle gray border */
+  padding-left: 2rem;
+  margin: 3rem 0;
+  font-size: 1.25rem;
+  line-height: 1.6;
+  color: #ffffff;
+}
+
+.wp-content blockquote p {
+  margin-bottom: 0;
+  color: #ffffff;
+  font-weight: 500;
+}
