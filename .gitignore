@@ -36,3 +36,7 @@ frontend/yarn-error.log*
 frontend/.pnpm-debug.log*
 frontend/*.tsbuildinfo
 frontend/next-env.d.ts
+
+# Large deployment artifacts
+*.zip
+README_DEPLOY.md

@@ -8,6 +8,11 @@ const nextConfig: NextConfig = {
         hostname: 'chillocreative.test',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'chillocreative.com',
+        pathname: '/**',
+      },
     ],
   },
 };

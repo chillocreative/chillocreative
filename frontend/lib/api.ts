@@ -1,26 +1,28 @@
 export async function fetchGraphQL(query: string, variables = {}) {
-    const res = await fetch(process.env.NEXT_PUBLIC_WORDPRESS_API_URL as string, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            query,
-            variables,
-        }),
-        cache: 'no-store', // Force fresh data on every request
-    });
+    try {
+        const res = await fetch(process.env.NEXT_PUBLIC_WORDPRESS_API_URL as string, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                query,
+                variables,
+            }),
+            cache: 'no-store', // Force fresh data on every request
+        });
 
-    const json = await json_to_string(res.json());
+        const json = await res.json();
 
-    if (json.errors) {
-        console.error(json.errors);
-        throw new Error('Failed to fetch API');
+        if (json.errors) {
+            console.error('GraphQL Errors:', JSON.stringify(json.errors, null, 2));
+            throw new Error('Failed to fetch API: ' + json.errors[0].message);
+        }
+
+        return json.data;
+    } catch (error) {
+        console.error('Fetch Error:', error);
+        throw error;
     }
-
-    return json.data;
 }
 
-function json_to_string(jsonPromise: Promise<any>) {
-    return jsonPromise.then(data => data);
-}
