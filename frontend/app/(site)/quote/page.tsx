@@ -217,11 +217,11 @@ export default function QuotePage() {
 
         doc.setFontSize(10);
         doc.setTextColor(TEXT_LIGHT[0], TEXT_LIGHT[1], TEXT_LIGHT[2]);
-        doc.text('Subtotal:', 140, finalY);
-        doc.text(`RM ${total.toLocaleString()}`, 175, finalY, { align: 'right' });
+        doc.text('Subtotal:', 165, finalY, { align: 'right' });
+        doc.text(`RM ${total.toLocaleString()}`, 195, finalY, { align: 'right' });
 
-        doc.text('Tax (0%):', 140, finalY + 7);
-        doc.text('RM 0.00', 175, finalY + 7, { align: 'right' });
+        doc.text('Tax (0%):', 165, finalY + 7, { align: 'right' });
+        doc.text('RM 0.00', 195, finalY + 7, { align: 'right' });
 
         // Divider Line
         doc.setDrawColor(BRAND_PURPLE[0], BRAND_PURPLE[1], BRAND_PURPLE[2]);
@@ -231,8 +231,8 @@ export default function QuotePage() {
         doc.setFontSize(14);
         doc.setFont(undefined, 'bold');
         doc.setTextColor(BRAND_PURPLE[0], BRAND_PURPLE[1], BRAND_PURPLE[2]);
-        doc.text('TOTAL:', 135, finalY + 20); // Moved left slightly
-        doc.text(`RM ${total.toLocaleString()}`, 190, finalY + 20, { align: 'right' }); // Moved right slightly
+        doc.text('TOTAL:', 165, finalY + 20, { align: 'right' });
+        doc.text(`RM ${total.toLocaleString()}`, 195, finalY + 20, { align: 'right' });
 
         // 6. Footer & Terms
         const pageHeight = doc.internal.pageSize.height;
