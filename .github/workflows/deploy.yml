@@ -1,0 +1,33 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd ~/chillocreative
+            
+            # 1. Pull latest code
+            git pull origin main
+            
+            # 2. Frontend Build
+            cd frontend
+            npm install
+            npx prisma generate
+            npm run build
+            
+            # 3. Restart Application
+            pm2 restart chillo-frontend || pm2 start npm --name "chillo-frontend" -- run start
+            
+            echo "🚀 Deployment Successful!"
