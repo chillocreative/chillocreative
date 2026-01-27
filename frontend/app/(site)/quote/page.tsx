@@ -115,64 +115,146 @@ export default function QuotePage() {
         const doc = new jsPDF() as any;
         const total = calculateTotal();
         const service = services.find(s => s.id === selectedService);
+        const quoteNo = `CQ-${new Date().getTime().toString().slice(-6)}`;
 
-        // Header
-        doc.setFillColor(31, 41, 55);
-        doc.rect(0, 0, 210, 40, 'F');
+        // Brand Color Scheme
+        const BRAND_PURPLE = [147, 51, 234]; // #9333ea
+        const TEXT_DARK = [31, 41, 55];
+        const TEXT_LIGHT = [107, 114, 128];
+
+        // 1. Sidebar/Header Branding
+        doc.setFillColor(BRAND_PURPLE[0], BRAND_PURPLE[1], BRAND_PURPLE[2]);
+        doc.rect(0, 0, 210, 45, 'F');
 
         doc.setTextColor(255, 255, 255);
-        doc.setFontSize(22);
+        doc.setFontSize(26);
+        doc.setFont(undefined, 'bold');
         doc.text('CHILLO CREATIVE', 15, 20);
+
         doc.setFontSize(10);
-        doc.text('BY CH GLOBAL EMPIRE (003124386-V)', 15, 28);
+        doc.setFont(undefined, 'normal');
+        doc.text('BY CH GLOBAL EMPIRE (003124386-V)', 15, 27);
 
         doc.setFontSize(9);
         doc.text('56 Lorong Shahbandar 10, Bertam Perdana 3', 130, 15);
         doc.text('13200 Kepala Batas, Penang, Malaysia', 130, 20);
         doc.text('Phone: +6.011.1001.9843', 130, 25);
-        doc.text('Web: www.chillocreative.com', 130, 30);
+        doc.text('E: hello@chillocreative.com', 130, 30);
+        doc.text('W: www.chillocreative.com', 130, 35);
 
-        // Bill To
-        doc.setTextColor(31, 41, 55);
-        doc.setFontSize(14);
-        doc.text('QUOTATION FOR:', 15, 60);
-        doc.setFontSize(11);
-        doc.text(`Name: ${formData.name}`, 15, 68);
-        doc.text(`Email: ${formData.email}`, 15, 74);
-        doc.text(`Phone: ${formData.phone}`, 15, 80);
-        doc.text(`Date: ${new Date().toLocaleDateString()}`, 130, 68);
-        doc.text(`Valid Until: ${new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString()}`, 130, 74);
+        // 2. Title & Meta Data
+        doc.setTextColor(TEXT_DARK[0], TEXT_DARK[1], TEXT_DARK[2]);
+        doc.setFontSize(22);
+        doc.setFont(undefined, 'bold');
+        doc.text('QUOTATION', 15, 65);
 
-        // Table
+        doc.setFontSize(10);
+        doc.setFont(undefined, 'normal');
+        doc.setTextColor(TEXT_LIGHT[0], TEXT_LIGHT[1], TEXT_LIGHT[2]);
+        doc.text(`Quotation No: ${quoteNo}`, 15, 72);
+        doc.text(`Date Issued: ${new Date().toLocaleDateString('en-MY', { day: 'numeric', month: 'long', year: 'numeric' })}`, 15, 77);
+        doc.text(`Valid Until: ${new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toLocaleDateString()}`, 15, 82);
+
+        // 3. Client Details (Box Styling)
+        doc.setFillColor(249, 250, 251);
+        doc.rect(120, 55, 75, 35, 'F');
+        doc.setDrawColor(229, 231, 235);
+        doc.rect(120, 55, 75, 35, 'S');
+
+        doc.setTextColor(TEXT_DARK[0], TEXT_DARK[1], TEXT_DARK[2]);
+        doc.setFontSize(10);
+        doc.setFont(undefined, 'bold');
+        doc.text('PREPARED FOR:', 125, 62);
+        doc.setFont(undefined, 'normal');
+        doc.text(formData.name.toUpperCase(), 125, 69);
+        doc.setFontSize(9);
+        doc.setTextColor(TEXT_LIGHT[0], TEXT_LIGHT[1], TEXT_LIGHT[2]);
+        doc.text(formData.email, 125, 75);
+        doc.text(formData.phone, 125, 81);
+
+        // 4. Quotation Table
         const tableData = [
-            [service?.name || 'Service', '1', `RM ${service?.basePrice?.toLocaleString() || 0}`],
+            [
+                { content: service?.name || 'Base Service Package', styles: { fontStyle: 'bold' } },
+                '1',
+                `RM ${service?.basePrice?.toLocaleString() || 0}`
+            ],
             ...selectedFeatures.map(fid => {
                 const feat = features.find(f => f.id === fid);
-                return [feat?.name || '', '1', `RM ${feat?.price?.toLocaleString() || 0}`];
+                return [
+                    feat?.name || '',
+                    '1',
+                    `RM ${feat?.price?.toLocaleString() || 0}`
+                ];
             })
         ];
 
         doc.autoTable({
-            startY: 90,
-            head: [['Description', 'Qty', 'Amount (RM)']],
+            startY: 100,
+            head: [['DESCRIPTION', 'QTY', 'PRICE (RM)']],
             body: tableData,
-            theme: 'striped',
-            headStyles: { fillColor: [147, 51, 234] },
+            theme: 'grid',
+            headStyles: {
+                fillColor: BRAND_PURPLE,
+                fontSize: 10,
+                cellPadding: 4
+            },
+            bodyStyles: {
+                fontSize: 9,
+                cellPadding: 4,
+                textColor: TEXT_DARK
+            },
+            columnStyles: {
+                0: { cellWidth: 120 },
+                1: { halign: 'center' },
+                2: { halign: 'right' }
+            }
         });
 
+        // 5. Calculations
         const finalY = (doc as any).lastAutoTable.finalY + 10;
+
+        doc.setFontSize(10);
+        doc.setTextColor(TEXT_LIGHT[0], TEXT_LIGHT[1], TEXT_LIGHT[2]);
+        doc.text('Subtotal:', 140, finalY);
+        doc.text(`RM ${total.toLocaleString()}`, 175, finalY, { align: 'right' });
+
+        doc.text('Tax (0%):', 140, finalY + 7);
+        doc.text('RM 0.00', 175, finalY + 7, { align: 'right' });
+
+        // Divider Line
+        doc.setDrawColor(BRAND_PURPLE[0], BRAND_PURPLE[1], BRAND_PURPLE[2]);
+        doc.setLineWidth(0.5);
+        doc.line(140, finalY + 12, 195, finalY + 12);
 
         doc.setFontSize(14);
         doc.setFont(undefined, 'bold');
-        doc.text(`GRAND TOTAL:  RM ${total.toLocaleString()}`, 130, finalY + 10);
+        doc.setTextColor(BRAND_PURPLE[0], BRAND_PURPLE[1], BRAND_PURPLE[2]);
+        doc.text('TOTAL:', 140, finalY + 20);
+        doc.text(`RM ${total.toLocaleString()}`, 175, finalY + 20, { align: 'right' });
+
+        // 6. Footer & Terms
+        const pageHeight = doc.internal.pageSize.height;
+
+        doc.setDrawColor(229, 231, 235);
+        doc.line(15, pageHeight - 50, 195, pageHeight - 50);
 
         doc.setFontSize(10);
-        doc.setFont(undefined, 'normal');
-        doc.setTextColor(107, 114, 128);
-        doc.text('Notes: This is an automatically generated estimate. Final price may vary based on exact requirements.', 15, finalY + 30);
-        doc.text('Payment Terms: 50% Upfront, 50% Before Handover.', 15, finalY + 36);
+        doc.setTextColor(TEXT_DARK[0], TEXT_DARK[1], TEXT_DARK[2]);
+        doc.text('Terms & Conditions:', 15, pageHeight - 40);
 
-        doc.save(`Quotation_${formData.name.replace(/\s/g, '_')}.pdf`);
+        doc.setFontSize(8);
+        doc.setTextColor(TEXT_LIGHT[0], TEXT_LIGHT[1], TEXT_LIGHT[2]);
+        doc.text('1. Payment: 50% deposit required to commence work.', 15, pageHeight - 34);
+        doc.text('2. This is a system-generated estimate based on your selections.', 15, pageHeight - 30);
+        doc.text('3. Full ownership of assets is transferred upon final payment.', 15, pageHeight - 26);
+
+        doc.setFontSize(12);
+        doc.setFont(undefined, 'italic');
+        doc.setTextColor(BRAND_PURPLE[0], BRAND_PURPLE[1], BRAND_PURPLE[2]);
+        doc.text('Looking forward to creating magic with you!', 105, pageHeight - 15, { align: 'center' });
+
+        doc.save(`CHILLO_QUOTE_${formData.name.replace(/\s/g, '_').toUpperCase()}.pdf`);
     };
 
     const handleFinalSubmit = async () => {
