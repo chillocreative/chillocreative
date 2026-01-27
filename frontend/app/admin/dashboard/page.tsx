@@ -33,7 +33,7 @@ export default async function DashboardPage() {
         { name: 'Total Leads', value: leadsCount.toString(), icon: Users, color: 'text-blue-400' },
         { name: 'Active Projects', value: projectCount.toString(), icon: FileText, color: 'text-purple-400' },
         { name: 'Total Invoices', value: invoicesCount.toString(), icon: Clock, color: 'text-yellow-400' },
-        { name: 'Paid Revenue', value: `$${totalRevenueSum.toLocaleString()}`, icon: TrendingUp, color: 'text-green-400' },
+        { name: 'Paid Revenue', value: `RM ${totalRevenueSum.toLocaleString()}`, icon: TrendingUp, color: 'text-green-400' },
     ];
 
     return (
@@ -97,7 +97,7 @@ export default async function DashboardPage() {
                                             </span>
                                         </td>
                                         <td className="px-6 py-4 text-sm text-gray-400">
-                                            {new Date(lead.createdAt).toLocaleDateString()}
+                                            {new Date(lead.createdAt).toLocaleDateString('en-GB')}
                                         </td>
                                     </tr>
                                 ))}
