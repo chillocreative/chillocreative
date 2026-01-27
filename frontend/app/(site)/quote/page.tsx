@@ -344,7 +344,15 @@ export default function QuotePage() {
             ...(featuresConfig[selectedService || ''] || []),
             ...(featuresConfig['default'] || [])
         ];
-        const selectedFeatsNames = selectedFeatures.map(fid => activeFeatures.find(f => f.id === fid)?.name).join(', ');
+
+        // Prepare structured items for backend quotation
+        const items = [
+            { description: service?.name || 'Selected Service', amount: service?.basePrice || 0 },
+            ...selectedFeatures.map(fid => {
+                const feat = activeFeatures.find(f => f.id === fid);
+                return { description: feat?.name || 'Extra Feature', amount: feat?.price || 0 };
+            })
+        ];
 
         try {
             const response = await fetch('/api/leads', {
@@ -353,7 +361,11 @@ export default function QuotePage() {
                 body: JSON.stringify({
                     ...formData,
                     service: service?.name || 'Custom Quote',
-                    message: `[AI ANALYZED QUOTE] Total: RM ${total}. \nFeatures: ${selectedFeatsNames} \nClient Description: ${projectDescription}`
+                    message: `[AI ANALYZED QUOTE] Total: RM ${total}. \nClient Description: ${projectDescription}`,
+                    quotationDetails: {
+                        total,
+                        items
+                    }
                 }),
             });
             const data = await response.json();

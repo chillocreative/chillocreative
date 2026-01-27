@@ -16,7 +16,7 @@ export async function GET() {
 export async function POST(request: Request) {
     try {
         const body = await request.json();
-        const { name, email, phone, service, message } = body;
+        const { name, email, phone, service, message, quotationDetails } = body;
 
         if (!name || !email) {
             return NextResponse.json({ error: 'Name and email are required' }, { status: 400 });
@@ -42,6 +42,28 @@ export async function POST(request: Request) {
                 status: 'New'
             }
         });
+
+        // Automatically create a Quotation if details are provided
+        if (quotationDetails) {
+            const lastQuote = await prisma.quotation.findFirst({
+                orderBy: { id: 'desc' }
+            });
+            const nextId = (lastQuote?.id || 0) + 1;
+            const quoteNumber = `QT-${new Date().getFullYear()}-${String(nextId).padStart(4, '0')}`;
+
+            await prisma.quotation.create({
+                data: {
+                    number: quoteNumber,
+                    clientName: name,
+                    clientEmail: email,
+                    amount: quotationDetails.total,
+                    subject: service,
+                    status: 'Sent',
+                    validUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
+                    details: quotationDetails.items || []
+                }
+            });
+        }
 
         return NextResponse.json({ success: true, lead });
     } catch (error) {
