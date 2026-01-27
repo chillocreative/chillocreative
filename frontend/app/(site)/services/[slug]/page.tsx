@@ -134,10 +134,16 @@ export default function SingleServicePage() {
                                     <p className="text-gray-400 mb-8">Let&apos;s build something extraordinary together.</p>
                                     <Link
                                         href={`/contact?subject=${encodeURIComponent(service.title)}`}
-                                        className="flex items-center justify-center gap-3 w-full py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-2xl font-bold hover:shadow-[0_0_20px_rgba(168,85,247,0.4)] transition-all transform hover:scale-[1.02]"
+                                        className="flex items-center justify-center gap-3 w-full py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-2xl font-bold hover:shadow-[0_0_20px_rgba(168,85,247,0.4)] transition-all transform hover:scale-[1.02] mb-4"
                                     >
                                         Start Project
                                         <Send className="w-4 h-4" />
+                                    </Link>
+                                    <Link
+                                        href="/quote"
+                                        className="flex items-center justify-center gap-3 w-full py-4 bg-white/5 border border-white/10 text-white rounded-2xl font-bold hover:bg-white/10 transition-all transform hover:scale-[1.02]"
+                                    >
+                                        Request for Quotation
                                     </Link>
                                 </div>
 

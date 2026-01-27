@@ -71,8 +71,11 @@ const Hero = () => {
                             <span className="relative z-10 group-hover:text-purple-600 transition-colors">Start a Project</span>
                             <div className="absolute inset-0 bg-white" />
                         </Link>
-                        <Link href="/portfolio" className="px-8 py-4 bg-white/5 border border-white/20 text-white rounded-full font-bold text-lg hover:bg-white/10 transition-all backdrop-blur-sm flex items-center gap-2 hover:gap-4">
-                            View Our Work <span>&rarr;</span>
+                        <Link href="/quote" className="px-8 py-4 bg-gradient-to-r from-purple-600/20 to-pink-600/20 border border-white/20 text-white rounded-full font-bold text-lg hover:from-purple-600/30 hover:to-pink-600/30 transition-all backdrop-blur-sm">
+                            Request for Quotation
+                        </Link>
+                        <Link href="/portfolio" className="text-white hover:text-purple-400 transition-all font-bold group flex items-center gap-2">
+                            View Our Work <span className="transform group-hover:translate-x-1 transition-transform">&rarr;</span>
                         </Link>
                     </div>
 
