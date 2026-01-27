@@ -69,9 +69,12 @@ export default async function DashboardLayout({
 
             {/* Main Content */}
             <main className="flex-1 flex flex-col min-h-screen overflow-hidden">
-                <header className="h-16 bg-gray-800 border-b border-gray-700 flex items-center justify-between px-8">
-                    <h2 className="text-xl font-semibold">Admin Panel</h2>
-                    <div className="flex items-center space-x-4">
+                <header className="h-16 bg-gray-800 border-b border-gray-700 flex items-center justify-between px-6 md:px-8">
+                    <h2 className="text-lg md:text-xl font-semibold">Admin Panel</h2>
+                    <div className="flex items-center space-x-3 md:space-x-4">
+                        <Link href="/api/auth/logout" className="md:hidden p-2 text-gray-400 hover:text-red-400 transition-colors" title="Logout">
+                            <LogOut size={20} />
+                        </Link>
                         <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center text-xs font-bold">
                             RA
                         </div>
