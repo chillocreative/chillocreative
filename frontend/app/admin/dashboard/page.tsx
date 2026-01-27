@@ -2,24 +2,38 @@ import { prisma } from '@/lib/prisma';
 import { Users, FileText, CheckCircle, Clock, TrendingUp } from 'lucide-react';
 
 export default async function DashboardPage() {
-    const leadsCount = await prisma.lead.count();
-    const newLeadsCount = await prisma.lead.count({ where: { status: 'New' } });
-    const projectCount = await prisma.project.count();
-    const invoicesCount = await prisma.invoice.count();
-    const totalRevenue = await prisma.invoice.aggregate({
-        _sum: { amountPaid: true }
-    });
+    let leadsCount = 0;
+    let newLeadsCount = 0;
+    let projectCount = 0;
+    let invoicesCount = 0;
+    let totalRevenueSum = 0;
+    let recentLeads: any[] = [];
 
-    const recentLeads = await prisma.lead.findMany({
-        orderBy: { createdAt: 'desc' },
-        take: 5,
-    });
+    try {
+        [leadsCount, newLeadsCount, projectCount, invoicesCount, recentLeads] = await Promise.all([
+            prisma.lead.count(),
+            prisma.lead.count({ where: { status: 'New' } }),
+            prisma.project.count(),
+            prisma.invoice.count(),
+            prisma.lead.findMany({
+                orderBy: { createdAt: 'desc' },
+                take: 5,
+            })
+        ]);
+
+        const totalRevenueResult = await prisma.invoice.aggregate({
+            _sum: { amountPaid: true }
+        });
+        totalRevenueSum = Number(totalRevenueResult._sum.amountPaid || 0);
+    } catch (error) {
+        console.error('Dashboard Data Fetch Error:', error);
+    }
 
     const stats = [
         { name: 'Total Leads', value: leadsCount.toString(), icon: Users, color: 'text-blue-400' },
         { name: 'Active Projects', value: projectCount.toString(), icon: FileText, color: 'text-purple-400' },
         { name: 'Total Invoices', value: invoicesCount.toString(), icon: Clock, color: 'text-yellow-400' },
-        { name: 'Paid Revenue', value: `$${Number(totalRevenue._sum.amountPaid || 0).toLocaleString()}`, icon: TrendingUp, color: 'text-green-400' },
+        { name: 'Paid Revenue', value: `$${totalRevenueSum.toLocaleString()}`, icon: TrendingUp, color: 'text-green-400' },
     ];
 
     return (

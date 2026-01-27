@@ -7,6 +7,80 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Invoice {
+  id          Int      @id @default(autoincrement())
+  number      String   @unique
+  amount      Decimal  @db.Decimal(10, 2)
+  amountPaid  Decimal  @default(0.00) @db.Decimal(10, 2)
+  status      String   @default("Pending")
+  dueDate     DateTime
+  clientName  String
+  clientEmail String?
+  description String?  @db.Text
+  projectId   Int?
+  project     Project? @relation(fields: [projectId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([projectId])
+  @@map("invoice")
+}
+
+model Lead {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String
+  phone     String?
+  service   String?
+  message   String?
+  status    String   @default("New")
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  project   Project?
+
+  @@map("lead")
+}
+
+model Project {
+  id          Int         @id @default(autoincrement())
+  title       String
+  description String?     @db.Text
+  status      String      @default("Planning")
+  startDate   DateTime    @default(now())
+  endDate     DateTime?
+  clientName  String
+  clientEmail String?
+  budget      Decimal?    @db.Decimal(10, 2)
+  leadId      Int?        @unique
+  lead        Lead?       @relation(fields: [leadId], references: [id])
+  invoices    Invoice[]
+  quotations  Quotation[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@map("project")
+}
+
+model Quotation {
+  id          Int      @id @default(autoincrement())
+  number      String   @unique
+  amount      Decimal  @db.Decimal(10, 2)
+  status      String   @default("Draft")
+  validUntil  DateTime
+  clientName  String
+  clientEmail String?
+  subject     String?  @db.Text
+  details     Json?
+  projectId   Int?
+  project     Project? @relation(fields: [projectId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([projectId])
+  @@map("quotation")
+}
+
 model User {
   id        Int      @id @default(autoincrement())
   username  String   @unique
@@ -16,68 +90,6 @@ model User {
   role      String   @default("admin")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-}
 
-model Lead {
-  id          Int      @id @default(autoincrement())
-  name        String
-  email       String
-  phone       String?
-  service     String?
-  message     String?
-  status      String   @default("New") // New, In Progress, Contacted, Converted, Lost
-  notes       String?
-  createdAt   DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  project     Project?
-}
-
-model Project {
-  id          Int       @id @default(autoincrement())
-  title       String
-  description String?   @db.Text
-  status      String    @default("Planning") // Planning, Development, Review, Completed, On Hold
-  startDate   DateTime  @default(now())
-  endDate     DateTime?
-  clientName  String
-  clientEmail String?
-  budget      Decimal?   @db.Decimal(10, 2)
-  leadId      Int?      @unique
-  lead        Lead?     @relation(fields: [leadId], references: [id])
-  invoices    Invoice[]
-  quotations  Quotation[]
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-}
-
-model Invoice {
-  id          Int      @id @default(autoincrement())
-  number      String   @unique // e.g., INV-2026-001
-  amount      Decimal  @db.Decimal(10, 2)
-  amountPaid  Decimal  @default(0) @db.Decimal(10, 2)
-  status      String   @default("Pending") // Pending, Paid, Overdue, Cancelled
-  dueDate     DateTime
-  clientName  String
-  clientEmail String?
-  description String?  @db.Text
-  projectId   Int?
-  project     Project? @relation(fields: [projectId], references: [id])
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-}
-
-model Quotation {
-  id          Int      @id @default(autoincrement())
-  number      String   @unique // e.g., QT-2026-001
-  amount      Decimal  @db.Decimal(10, 2)
-  status      String   @default("Draft") // Draft, Sent, Accepted, Declined, converted_to_invoice
-  validUntil  DateTime
-  clientName  String
-  clientEmail String?
-  subject     String?  @db.Text
-  details     Json?    // For storing line items: [{description, quantity, unit_price, total}]
-  projectId   Int?
-  project     Project? @relation(fields: [projectId], references: [id])
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  @@map("user")
 }
