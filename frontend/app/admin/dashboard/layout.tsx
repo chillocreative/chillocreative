@@ -2,7 +2,7 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { jwtVerify } from 'jose';
 import Link from 'next/link';
-import { LayoutDashboard, Users, FolderKanban, Settings, LogOut } from 'lucide-react';
+import { LayoutDashboard, Users, FolderKanban, FileText, Settings, LogOut } from 'lucide-react';
 
 const JWT_SECRET = new TextEncoder().encode(
     process.env.JWT_SECRET || 'rahim-chillo-secret-1977'
@@ -48,6 +48,10 @@ export default async function DashboardLayout({
                     <Link href="/admin/dashboard/projects" className="flex items-center space-x-3 p-3 rounded-lg text-gray-400 hover:bg-gray-700 hover:text-white transition-colors">
                         <FolderKanban size={20} />
                         <span>Projects</span>
+                    </Link>
+                    <Link href="/admin/dashboard/invoices" className="flex items-center space-x-3 p-3 rounded-lg text-gray-400 hover:bg-gray-700 hover:text-white transition-colors">
+                        <FileText size={20} />
+                        <span>Invoices</span>
                     </Link>
                     <Link href="/admin/dashboard/settings" className="flex items-center space-x-3 p-3 rounded-lg text-gray-400 hover:bg-gray-700 hover:text-white transition-colors">
                         <Settings size={20} />
