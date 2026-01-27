@@ -57,7 +57,7 @@ const Header = () => {
 
   return (
     <>
-      <header className="fixed top-6 left-0 right-0 z-50 flex flex-col items-center px-4">
+      <header className="fixed top-6 left-0 right-0 z-[9999] flex flex-col items-center px-4">
         <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-full shadow-2xl px-8 py-4 flex items-center justify-between gap-12 max-w-5xl w-full text-white relative">
           <Link href="/" className="flex items-center gap-3" onClick={closeMobileMenu}>
             <Image
@@ -68,7 +68,7 @@ const Header = () => {
               className="h-16 w-auto mix-blend-screen object-contain rounded-full brightness-125 hover:brightness-150 transition-all"
             />
             <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-400">
-              Chillo Creative
+              Chillo Creative ✨
             </span>
           </Link>
 
