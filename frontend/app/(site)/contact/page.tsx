@@ -146,23 +146,23 @@ export default function ContactPage() {
                         ) : (
                             <form onSubmit={handleSubmit} className="space-y-6">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div>
-                                        <label className="block text-sm font-semibold text-gray-300 mb-2 uppercase">Name</label>
+                                    <div className="space-y-2">
+                                        <label className="block text-sm font-semibold text-gray-300 uppercase">Name</label>
                                         <input
                                             required
                                             type="text"
-                                            className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all placeholder-gray-500 uppercase"
+                                            className="w-full h-[56px] px-4 rounded-xl bg-white/5 border border-white/10 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all placeholder-gray-500 uppercase"
                                             placeholder="John Doe"
                                             value={formData.name}
                                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                         />
                                     </div>
-                                    <div>
-                                        <label className="block text-sm font-semibold text-gray-300 mb-2 uppercase">Email</label>
+                                    <div className="space-y-2">
+                                        <label className="block text-sm font-semibold text-gray-300 uppercase">Email</label>
                                         <input
                                             required
                                             type="email"
-                                            className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all placeholder-gray-500 lowercase"
+                                            className="w-full h-[56px] px-4 rounded-xl bg-white/5 border border-white/10 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all placeholder-gray-500 lowercase"
                                             placeholder="john@example.com"
                                             value={formData.email}
                                             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
@@ -173,15 +173,15 @@ export default function ContactPage() {
                                     <div className="space-y-2">
                                         <label className="block text-sm font-semibold text-gray-300 uppercase">Phone Number</label>
                                         <div className="flex gap-2">
-                                            <div className="relative w-32 shrink-0">
+                                            <div className="relative w-36 shrink-0">
                                                 <select
                                                     value={countryCode}
                                                     onChange={(e) => setCountryCode(e.target.value)}
-                                                    className="w-full h-[54px] pl-4 pr-10 rounded-xl bg-white/5 border border-white/10 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all appearance-none cursor-pointer text-sm font-bold"
+                                                    className="w-full h-[56px] pl-4 pr-10 rounded-xl bg-white/5 border border-white/10 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all appearance-none cursor-pointer text-sm font-bold"
                                                 >
                                                     {countries.sort((a, b) => a.name === "Malaysia" ? -1 : b.name === "Malaysia" ? 1 : 0).map((c) => (
                                                         <option key={`${c.iso}-${c.code}`} value={c.code} className="bg-gray-900">
-                                                            {c.iso} ({c.code})
+                                                            {c.flag} {c.iso} ({c.code})
                                                         </option>
                                                     ))}
                                                 </select>
@@ -190,7 +190,7 @@ export default function ContactPage() {
                                             <input
                                                 required
                                                 type="tel"
-                                                className="flex-1 h-[54px] px-4 rounded-xl bg-white/5 border border-white/10 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all placeholder-gray-500 font-bold"
+                                                className="flex-1 h-[56px] px-4 rounded-xl bg-white/5 border border-white/10 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all placeholder-gray-500 font-bold"
                                                 placeholder="123456789"
                                                 value={phoneNumber}
                                                 onChange={(e) => {
@@ -204,7 +204,7 @@ export default function ContactPage() {
                                         <label className="block text-sm font-semibold text-gray-300 uppercase">Subject</label>
                                         <div className="relative">
                                             <select
-                                                className="w-full h-[54px] px-4 rounded-xl bg-white/5 border border-white/10 text-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all [&>option]:bg-gray-900 appearance-none cursor-pointer"
+                                                className="w-full h-[56px] px-4 rounded-xl bg-white/5 border border-white/10 text-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all [&>option]:bg-gray-900 appearance-none cursor-pointer"
                                                 value={formData.service}
                                                 onChange={(e) => setFormData({ ...formData, service: e.target.value })}
                                             >
