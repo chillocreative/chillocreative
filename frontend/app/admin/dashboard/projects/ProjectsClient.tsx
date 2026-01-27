@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Plus, Clock, Briefcase, DollarSign, AlertCircle, X, CheckCircle2, ChevronRight, MoreVertical, Trash2 } from 'lucide-react';
+import { Plus, Clock, Briefcase, DollarSign, AlertCircle, X, CheckCircle2, ChevronRight, MoreVertical, Trash2, Eye, Edit } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 export default function ProjectsClient({ initialProjects }: { initialProjects: any[] }) {
@@ -85,9 +85,10 @@ export default function ProjectsClient({ initialProjects }: { initialProjects: a
                                     </span>
                                     <button
                                         onClick={() => handleDeleteProject(project.id)}
-                                        className="text-gray-500 hover:text-red-400 transition-colors"
+                                        className="p-1.5 text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all"
+                                        title="Delete Project"
                                     >
-                                        <Trash2 size={14} />
+                                        <Trash2 size={16} />
                                     </button>
                                 </div>
                             </div>
@@ -133,9 +134,10 @@ export default function ProjectsClient({ initialProjects }: { initialProjects: a
                                 <Clock size={14} />
                                 <span>Updated {new Date(project.updatedAt).toLocaleDateString()}</span>
                             </div>
-                            <button className="text-xs font-bold text-blue-400 hover:text-blue-300 transition-colors uppercase flex items-center">
-                                Details <ChevronRight size={14} className="ml-1" />
-                            </button>
+                            <div className="flex items-center space-x-2">
+                                <button className="p-2 text-gray-400 hover:text-blue-400 hover:bg-blue-500/10 rounded-lg transition-all" title="View Details"><Eye size={16} /></button>
+                                <button className="p-2 text-gray-400 hover:text-green-400 hover:bg-green-500/10 rounded-lg transition-all" title="Edit Project"><Edit size={16} /></button>
+                            </div>
                         </div>
                     </div>
                 ))}

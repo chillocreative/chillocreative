@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Plus, Search, FileText, Download, MoreVertical, Trash2, X, DollarSign, Calendar, User, FileCheck, Send, CheckCircle2 } from 'lucide-react';
+import { Plus, Search, FileText, Download, MoreVertical, Trash2, X, DollarSign, Calendar, User, FileCheck, Send, CheckCircle2, Eye, Edit } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 export default function QuotationsClient({ initialQuotations, projects }: { initialQuotations: any[], projects: any[] }) {
@@ -92,9 +92,9 @@ export default function QuotationsClient({ initialQuotations, projects }: { init
                                     </td>
                                     <td className="px-8 py-6">
                                         <span className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest border ${qt.status === 'Accepted' ? 'bg-green-500/10 text-green-400 border-green-500/20' :
-                                                qt.status === 'Draft' ? 'bg-gray-500/10 text-gray-400 border-gray-500/20' :
-                                                    qt.status === 'Sent' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' :
-                                                        'bg-red-500/10 text-red-500 border-red-500/20'
+                                            qt.status === 'Draft' ? 'bg-gray-500/10 text-gray-400 border-gray-500/20' :
+                                                qt.status === 'Sent' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' :
+                                                    'bg-red-500/10 text-red-500 border-red-500/20'
                                             }`}>
                                             {qt.status}
                                         </span>
@@ -103,12 +103,15 @@ export default function QuotationsClient({ initialQuotations, projects }: { init
                                         {new Date(qt.validUntil).toLocaleDateString()}
                                     </td>
                                     <td className="px-8 py-6 text-right">
-                                        <div className="flex items-center justify-end space-x-3">
-                                            <button className="p-2.5 bg-gray-700/50 text-gray-400 border border-transparent hover:border-teal-500/50 hover:text-teal-400 rounded-xl transition-all"><Download size={18} /></button>
-                                            <button className="p-2.5 bg-gray-700/50 text-gray-400 border border-transparent hover:border-blue-500/50 hover:text-blue-400 rounded-xl transition-all"><Send size={18} /></button>
+                                        <div className="flex items-center justify-end space-x-2">
+                                            <button className="p-2 bg-gray-700/50 text-gray-400 border border-transparent hover:border-teal-500/50 hover:text-teal-400 rounded-xl transition-all" title="View Quotation"><Eye size={18} /></button>
+                                            <button className="p-2 bg-gray-700/50 text-gray-400 border border-transparent hover:border-green-500/50 hover:text-green-400 rounded-xl transition-all" title="Edit Quotation"><Edit size={18} /></button>
+                                            <button className="p-2 bg-gray-700/50 text-gray-400 border border-transparent hover:border-white/50 hover:text-white rounded-xl transition-all" title="Download PDF"><Download size={18} /></button>
+                                            <button className="p-2 bg-gray-700/50 text-gray-400 border border-transparent hover:border-blue-500/50 hover:text-blue-400 rounded-xl transition-all" title="Send Quotation"><Send size={18} /></button>
                                             <button
                                                 onClick={() => handleDeleteQuotation(qt.id)}
-                                                className="p-2.5 bg-gray-700/50 text-gray-400 border border-transparent hover:border-red-500/50 hover:text-red-500 rounded-xl transition-all"
+                                                className="p-2 bg-gray-700/50 text-gray-400 border border-transparent hover:border-red-500/50 hover:text-red-500 rounded-xl transition-all"
+                                                title="Delete Quotation"
                                             >
                                                 <Trash2 size={18} />
                                             </button>

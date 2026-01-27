@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Plus, Search, FileText, Download, MoreVertical, Trash2, X, DollarSign, Calendar, User } from 'lucide-react';
+import { Plus, Search, FileText, Download, MoreVertical, Trash2, X, DollarSign, Calendar, User, Eye, Edit } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 export default function InvoicesClient({ initialInvoices, projects }: { initialInvoices: any[], projects: any[] }) {
@@ -94,8 +94,8 @@ export default function InvoicesClient({ initialInvoices, projects }: { initialI
                                     </td>
                                     <td className="px-6 py-5">
                                         <span className={`px-2 py-1 rounded-md text-[10px] font-black uppercase tracking-widest border ${invoice.status === 'Paid' ? 'bg-green-500/10 text-green-400 border-green-500/20' :
-                                                invoice.status === 'Overdue' ? 'bg-red-500/10 text-red-500 border-red-500/20' :
-                                                    'bg-yellow-500/10 text-yellow-500 border-yellow-500/20'
+                                            invoice.status === 'Overdue' ? 'bg-red-500/10 text-red-500 border-red-500/20' :
+                                                'bg-yellow-500/10 text-yellow-500 border-yellow-500/20'
                                             }`}>
                                             {invoice.status}
                                         </span>
@@ -105,10 +105,13 @@ export default function InvoicesClient({ initialInvoices, projects }: { initialI
                                     </td>
                                     <td className="px-6 py-5 text-right">
                                         <div className="flex items-center justify-end space-x-2">
-                                            <button className="p-2 text-gray-400 hover:text-white transition-colors"><Download size={18} /></button>
+                                            <button className="p-2 text-gray-400 hover:text-blue-400 hover:bg-blue-500/10 rounded-lg transition-all" title="View Invoice"><Eye size={18} /></button>
+                                            <button className="p-2 text-gray-400 hover:text-green-400 hover:bg-green-500/10 rounded-lg transition-all" title="Edit Invoice"><Edit size={18} /></button>
+                                            <button className="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-all" title="Download PDF"><Download size={18} /></button>
                                             <button
                                                 onClick={() => handleDeleteInvoice(invoice.id)}
-                                                className="p-2 text-gray-400 hover:text-red-500 transition-colors"
+                                                className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-all"
+                                                title="Delete Invoice"
                                             >
                                                 <Trash2 size={18} />
                                             </button>

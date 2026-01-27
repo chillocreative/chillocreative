@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Search, Filter, MoreHorizontal, User, Mail, Calendar, Tag, Trash2, Edit, X, Phone } from 'lucide-react';
+import { Search, Filter, MoreHorizontal, User, Mail, Calendar, Tag, Trash2, Edit, X, Phone, Eye } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 export default function LeadsClient({ initialLeads }: { initialLeads: any[] }) {
@@ -11,7 +11,6 @@ export default function LeadsClient({ initialLeads }: { initialLeads: any[] }) {
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [currentLead, setCurrentLead] = useState<any>(null);
     const [loading, setLoading] = useState(false);
-    const [showActions, setShowActions] = useState<number | null>(null);
     const router = useRouter();
 
     const filteredLeads = leads.filter(lead =>
@@ -148,46 +147,41 @@ export default function LeadsClient({ initialLeads }: { initialLeads: any[] }) {
                                     </td>
                                     <td className="px-6 py-4">
                                         <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${lead.status === 'New' ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20' :
-                                                lead.status === 'Converted' ? 'bg-green-500/10 text-green-400 border border-green-500/20' :
-                                                    'bg-purple-500/10 text-purple-400 border border-purple-500/20'
+                                            lead.status === 'Converted' ? 'bg-green-500/10 text-green-400 border border-green-500/20' :
+                                                'bg-purple-500/10 text-purple-400 border border-purple-500/20'
                                             }`}>
                                             {lead.status}
                                         </span>
                                     </td>
                                     <td className="px-6 py-4 text-right">
-                                        <div className="relative inline-block text-left">
+                                        <div className="flex items-center justify-end space-x-2">
                                             <button
-                                                onClick={() => setShowActions(showActions === lead.id ? null : lead.id)}
-                                                className="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg transition-all"
+                                                onClick={() => {
+                                                    setCurrentLead(lead);
+                                                    setIsEditModalOpen(true);
+                                                }}
+                                                className="p-2 text-gray-400 hover:text-blue-400 hover:bg-blue-500/10 rounded-lg transition-all"
+                                                title="View Lead"
                                             >
-                                                <MoreHorizontal size={20} />
+                                                <Eye size={18} />
                                             </button>
-
-                                            {showActions === lead.id && (
-                                                <div className="absolute right-0 mt-2 w-48 bg-gray-800 border border-gray-700 rounded-lg shadow-2xl z-50 overflow-hidden">
-                                                    <button
-                                                        onClick={() => {
-                                                            setCurrentLead(lead);
-                                                            setIsEditModalOpen(true);
-                                                            setShowActions(null);
-                                                        }}
-                                                        className="w-full flex items-center space-x-3 px-4 py-3 text-sm text-gray-300 hover:bg-gray-700 hover:text-white transition-colors"
-                                                    >
-                                                        <Edit size={16} />
-                                                        <span>Edit Lead</span>
-                                                    </button>
-                                                    <button
-                                                        onClick={() => {
-                                                            handleDeleteLead(lead.id);
-                                                            setShowActions(null);
-                                                        }}
-                                                        className="w-full flex items-center space-x-3 px-4 py-3 text-sm text-red-400 hover:bg-red-500/10 transition-colors"
-                                                    >
-                                                        <Trash2 size={16} />
-                                                        <span>Delete Lead</span>
-                                                    </button>
-                                                </div>
-                                            )}
+                                            <button
+                                                onClick={() => {
+                                                    setCurrentLead(lead);
+                                                    setIsEditModalOpen(true);
+                                                }}
+                                                className="p-2 text-gray-400 hover:text-purple-400 hover:bg-purple-500/10 rounded-lg transition-all"
+                                                title="Edit Lead"
+                                            >
+                                                <Edit size={18} />
+                                            </button>
+                                            <button
+                                                onClick={() => handleDeleteLead(lead.id)}
+                                                className="p-2 text-gray-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all"
+                                                title="Delete Lead"
+                                            >
+                                                <Trash2 size={18} />
+                                            </button>
                                         </div>
                                     </td>
                                 </tr>
