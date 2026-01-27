@@ -49,13 +49,13 @@ export default async function DashboardLayout({
                         <FileCheck size={20} />
                         <span>Quotations</span>
                     </Link>
-                    <Link href="/admin/dashboard/projects" className="flex items-center space-x-3 p-3 rounded-lg text-gray-400 hover:bg-gray-700 hover:text-white transition-colors">
-                        <FolderKanban size={20} />
-                        <span>Projects</span>
-                    </Link>
                     <Link href="/admin/dashboard/invoices" className="flex items-center space-x-3 p-3 rounded-lg text-gray-400 hover:bg-gray-700 hover:text-white transition-colors">
                         <FileText size={20} />
                         <span>Invoices</span>
+                    </Link>
+                    <Link href="/admin/dashboard/projects" className="flex items-center space-x-3 p-3 rounded-lg text-gray-400 hover:bg-gray-700 hover:text-white transition-colors">
+                        <FolderKanban size={20} />
+                        <span>Projects</span>
                     </Link>
                     <Link href="/admin/dashboard/settings" className="flex items-center space-x-3 p-3 rounded-lg text-gray-400 hover:bg-gray-700 hover:text-white transition-colors">
                         <Settings size={20} />

@@ -264,6 +264,17 @@ export default function LeadsClient({ initialLeads }: { initialLeads: any[] }) {
                                     <input name="phone" defaultValue={currentLead.phone} className="w-full bg-gray-900 border border-gray-700 rounded-lg py-2 px-3 text-white focus:ring-2 focus:ring-purple-500 outline-none" />
                                 </div>
                                 <div className="space-y-2">
+                                    <label className="text-xs font-bold text-gray-400 uppercase">Requested Service</label>
+                                    <select name="service" defaultValue={currentLead.service} className="w-full bg-gray-900 border border-gray-700 rounded-lg py-2 px-3 text-white focus:ring-2 focus:ring-purple-500 outline-none text-xs uppercase font-bold">
+                                        <option>Web Design</option>
+                                        <option>SEO</option>
+                                        <option>Branding</option>
+                                        <option>Marketing</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-1 gap-4">
+                                <div className="space-y-2">
                                     <label className="text-xs font-bold text-gray-400 uppercase">Status</label>
                                     <select name="status" defaultValue={currentLead.status} className="w-full bg-gray-900 border border-gray-700 rounded-lg py-2 px-3 text-white focus:ring-2 focus:ring-purple-500 outline-none text-xs uppercase font-bold">
                                         <option>New</option>
@@ -273,6 +284,10 @@ export default function LeadsClient({ initialLeads }: { initialLeads: any[] }) {
                                         <option>Lost</option>
                                     </select>
                                 </div>
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-xs font-bold text-gray-400 uppercase">Message/Notes</label>
+                                <textarea name="message" defaultValue={currentLead.message} rows={4} className="w-full bg-gray-900 border border-gray-700 rounded-lg py-2 px-3 text-white focus:ring-2 focus:ring-purple-500 outline-none resize-none" />
                             </div>
                             <div className="pt-4">
                                 <button type="submit" disabled={loading} className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 rounded-lg transition-all">
