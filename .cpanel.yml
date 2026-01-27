@@ -7,3 +7,4 @@ deployment:
     - /bin/cp frontend/package.json $DEPLOYPATH/frontend/package.json
     - /bin/cp frontend/server.js $DEPLOYPATH/frontend/server.js
     - /bin/cp frontend/.env.production $DEPLOYPATH/frontend/.env.production
+    - /bin/cp -R frontend/prisma $DEPLOYPATH/frontend/prisma

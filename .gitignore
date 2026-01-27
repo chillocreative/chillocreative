@@ -9,7 +9,7 @@ frontend/.yarn/*
 !frontend/.yarn/versions
 
 # next.js
-frontend/.next/
+# frontend/.next/
 frontend/out/
 
 # production
