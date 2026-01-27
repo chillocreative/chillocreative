@@ -1,9 +1,47 @@
 'use client';
 
+import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Mail, Phone, MapPin, Facebook, Instagram } from 'lucide-react';
+import { Mail, Phone, MapPin, Facebook, Instagram, Loader2, CheckCircle2 } from 'lucide-react';
 
 export default function ContactPage() {
+    const [formData, setFormData] = useState({
+        name: '',
+        email: '',
+        phone: '',
+        service: 'Web Design Project',
+        message: ''
+    });
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isSuccess, setIsSuccess] = useState(false);
+    const [error, setError] = useState('');
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsSubmitting(true);
+        setError('');
+
+        try {
+            const response = await fetch('/api/leads', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData),
+            });
+
+            if (!response.ok) {
+                const data = await response.json();
+                throw new Error(data.error || 'Something went wrong');
+            }
+
+            setIsSuccess(true);
+            setFormData({ name: '', email: '', phone: '', service: 'Web Design Project', message: '' });
+        } catch (err: any) {
+            setError(err.message);
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
     return (
         <div className="min-h-screen bg-[#050511] text-white pt-44 pb-20 relative overflow-hidden">
             {/* Background Vector */}
@@ -79,36 +117,105 @@ export default function ContactPage() {
                     </div>
 
                     <div className="p-10 md:w-2/3">
-                        <form className="space-y-6">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div>
-                                    <label className="block text-sm font-semibold text-gray-300 mb-2">Name</label>
-                                    <input type="text" className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all placeholder-gray-500" placeholder="John Doe" />
+                        {isSuccess ? (
+                            <motion.div
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                className="h-full flex flex-col items-center justify-center text-center space-y-4"
+                            >
+                                <div className="w-20 h-20 bg-green-500/10 rounded-full flex items-center justify-center text-green-500 mb-4">
+                                    <CheckCircle2 className="w-10 h-10" />
+                                </div>
+                                <h3 className="text-3xl font-bold text-white uppercase italic">Message Sent!</h3>
+                                <p className="text-gray-400 max-w-sm">Thank you for reaching out. Our team will get back to you within 24 hours.</p>
+                                <button
+                                    onClick={() => setIsSuccess(false)}
+                                    className="mt-6 px-8 py-3 bg-white/10 hover:bg-white/20 rounded-xl transition-all font-bold uppercase"
+                                >
+                                    Send Another Message
+                                </button>
+                            </motion.div>
+                        ) : (
+                            <form onSubmit={handleSubmit} className="space-y-6">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label className="block text-sm font-semibold text-gray-300 mb-2 uppercase">Name</label>
+                                        <input
+                                            required
+                                            type="text"
+                                            className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all placeholder-gray-500 uppercase"
+                                            placeholder="John Doe"
+                                            value={formData.name}
+                                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-semibold text-gray-300 mb-2 uppercase">Email</label>
+                                        <input
+                                            required
+                                            type="email"
+                                            className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all placeholder-gray-500 lowercase"
+                                            placeholder="john@example.com"
+                                            value={formData.email}
+                                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                        />
+                                    </div>
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label className="block text-sm font-semibold text-gray-300 mb-2 uppercase">Phone Number</label>
+                                        <input
+                                            type="tel"
+                                            className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all placeholder-gray-500"
+                                            placeholder="+60123456789"
+                                            value={formData.phone}
+                                            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-semibold text-gray-300 mb-2 uppercase">Subject</label>
+                                        <select
+                                            className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all [&>option]:bg-gray-900"
+                                            value={formData.service}
+                                            onChange={(e) => setFormData({ ...formData, service: e.target.value })}
+                                        >
+                                            <option>Web Design Project</option>
+                                            <option>Web Application</option>
+                                            <option>Mobile App</option>
+                                            <option>SEO Services</option>
+                                            <option>Other</option>
+                                        </select>
+                                    </div>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-semibold text-gray-300 mb-2">Email</label>
-                                    <input type="email" className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all placeholder-gray-500" placeholder="john@example.com" />
+                                    <label className="block text-sm font-semibold text-gray-300 mb-2 uppercase">Message</label>
+                                    <textarea
+                                        rows={5}
+                                        className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all placeholder-gray-500"
+                                        placeholder="Tell us about your project..."
+                                        value={formData.message}
+                                        onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                                    ></textarea>
                                 </div>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-semibold text-gray-300 mb-2">Subject</label>
-                                <select className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all [&>option]:bg-gray-900">
-                                    <option>Web Design Project</option>
-                                    <option>Web Application</option>
-                                    <option>Mobile App</option>
-                                    <option>SEO Services</option>
-                                    <option>Other</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-semibold text-gray-300 mb-2">Message</label>
-                                <textarea rows={5} className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all placeholder-gray-500" placeholder="Tell us about your project..."></textarea>
-                            </div>
 
-                            <button type="submit" className="w-full py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-bold hover:shadow-[0_0_20px_rgba(168,85,247,0.5)] transition-all transform hover:scale-[1.02]">
-                                Send Message
-                            </button>
-                        </form>
+                                {error && <p className="text-red-500 text-sm font-bold uppercase">{error}</p>}
+
+                                <button
+                                    disabled={isSubmitting}
+                                    type="submit"
+                                    className="w-full py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-bold hover:shadow-[0_0_20px_rgba(168,85,247,0.5)] transition-all transform hover:scale-[1.02] flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed uppercase"
+                                >
+                                    {isSubmitting ? (
+                                        <>
+                                            <Loader2 className="w-5 h-5 animate-spin" />
+                                            <span>Sending...</span>
+                                        </>
+                                    ) : (
+                                        <span>Send Message</span>
+                                    )}
+                                </button>
+                            </form>
+                        )}
                     </div>
                 </div>
             </div>

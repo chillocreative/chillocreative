@@ -1,0 +1,49 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  email     String?  @unique
+  password  String
+  name      String?
+  role      String   @default("admin")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Lead {
+  id          Int      @id @default(autoincrement())
+  name        String
+  email       String
+  phone       String?
+  service     String?
+  message     String?
+  status      String   @default("New") // New, In Progress, Contacted, Converted, Lost
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  project     Project?
+}
+
+model Project {
+  id          Int       @id @default(autoincrement())
+  title       String
+  description String?   @db.Text
+  status      String    @default("Planning") // Planning, Development, Review, Completed, On Hold
+  startDate   DateTime  @default(now())
+  endDate     DateTime?
+  clientName  String
+  clientEmail String?
+  budget      Decimal?   @db.Decimal(10, 2)
+  leadId      Int?      @unique
+  lead        Lead?     @relation(fields: [leadId], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}

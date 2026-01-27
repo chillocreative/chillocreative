@@ -1,20 +1,41 @@
 import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
 
 export async function GET() {
-    // Mock data access - in reality would connect to SQLite/MySQL
-    const leads = [
-        { id: 1, name: 'John Doe', email: 'john@example.com', service: 'Web Design', status: 'New', date: '2023-10-25' },
-        { id: 2, name: 'Jane Smith', email: 'jane@company.com', service: 'SEO', status: 'In Progress', date: '2023-10-24' },
-    ];
-
-    return NextResponse.json({ leads });
+    try {
+        const leads = await prisma.lead.findMany({
+            orderBy: { createdAt: 'desc' }
+        });
+        return NextResponse.json({ leads });
+    } catch (error) {
+        console.error('Error fetching leads:', error);
+        return NextResponse.json({ error: 'Failed to fetch leads' }, { status: 500 });
+    }
 }
 
 export async function POST(request: Request) {
-    const body = await request.json();
+    try {
+        const body = await request.json();
+        const { name, email, phone, service, message } = body;
 
-    // Here we would save to database
-    console.log('Received lead:', body);
+        if (!name || !email) {
+            return NextResponse.json({ error: 'Name and email are required' }, { status: 400 });
+        }
 
-    return NextResponse.json({ success: true, message: 'Lead saved' });
+        const lead = await prisma.lead.create({
+            data: {
+                name,
+                email,
+                phone,
+                service,
+                message,
+                status: 'New'
+            }
+        });
+
+        return NextResponse.json({ success: true, lead });
+    } catch (error) {
+        console.error('Error saving lead:', error);
+        return NextResponse.json({ error: 'Failed to save lead' }, { status: 500 });
+    }
 }

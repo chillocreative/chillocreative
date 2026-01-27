@@ -2,16 +2,40 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 export default function AdminLogin() {
-    const [email, setEmail] = useState('');
+    const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
+    const router = useRouter();
 
-    const handleLogin = (e: React.FormEvent) => {
+    const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
-        // TODO: Implement login logic
-        console.log('Login attempt', { email, password });
-        alert('Login logic not implemented yet');
+        setError('');
+        setLoading(true);
+
+        try {
+            const res = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password }),
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                throw new Error(data.error || 'Login failed');
+            }
+
+            // Redirect to dashboard
+            router.push('/admin/dashboard');
+        } catch (err: any) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -24,15 +48,22 @@ export default function AdminLogin() {
                     <p className="text-gray-400 mt-2">Enter credentials to access CRM</p>
                 </div>
 
+                {error && (
+                    <div className="mb-6 p-4 bg-red-500/10 border border-red-500/50 text-red-400 rounded-lg text-sm text-center">
+                        {error}
+                    </div>
+                )}
+
                 <form onSubmit={handleLogin} className="space-y-6">
                     <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">Email Address</label>
+                        <label className="block text-sm font-medium text-gray-300 mb-2">Username or Email</label>
                         <input
-                            type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
+                            type="text"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
                             className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none text-white transition-all"
-                            placeholder="admin@chillocreative.com"
+                            placeholder="rahim"
+                            required
                         />
                     </div>
 
@@ -44,14 +75,16 @@ export default function AdminLogin() {
                             onChange={(e) => setPassword(e.target.value)}
                             className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none text-white transition-all"
                             placeholder="••••••••"
+                            required
                         />
                     </div>
 
                     <button
                         type="submit"
-                        className="w-full py-3 bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg font-bold hover:from-purple-700 hover:to-blue-700 transition-all transform hover:scale-[1.02]"
+                        disabled={loading}
+                        className={`w-full py-3 bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg font-bold transition-all transform hover:scale-[1.02] ${loading ? 'opacity-50 cursor-not-allowed' : 'hover:from-purple-700 hover:to-blue-700'}`}
                     >
-                        Access Dashboard
+                        {loading ? 'Authenticating...' : 'Access Dashboard'}
                     </button>
                 </form>
 
