@@ -14,6 +14,7 @@ export async function PATCH(
             data: {
                 ...body,
                 amount: body.amount ? parseFloat(body.amount) : undefined,
+                amountPaid: body.amountPaid !== undefined ? parseFloat(body.amountPaid) : undefined,
                 dueDate: body.dueDate ? new Date(body.dueDate) : undefined,
                 projectId: body.projectId ? parseInt(body.projectId) : undefined,
             }

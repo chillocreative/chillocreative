@@ -7,8 +7,7 @@ export default async function DashboardPage() {
     const projectCount = await prisma.project.count();
     const invoicesCount = await prisma.invoice.count();
     const totalRevenue = await prisma.invoice.aggregate({
-        _sum: { amount: true },
-        where: { status: 'Paid' }
+        _sum: { amountPaid: true }
     });
 
     const recentLeads = await prisma.lead.findMany({
@@ -20,7 +19,7 @@ export default async function DashboardPage() {
         { name: 'Total Leads', value: leadsCount.toString(), icon: Users, color: 'text-blue-400' },
         { name: 'Active Projects', value: projectCount.toString(), icon: FileText, color: 'text-purple-400' },
         { name: 'Total Invoices', value: invoicesCount.toString(), icon: Clock, color: 'text-yellow-400' },
-        { name: 'Paid Revenue', value: `$${Number(totalRevenue._sum.amount || 0).toLocaleString()}`, icon: TrendingUp, color: 'text-green-400' },
+        { name: 'Paid Revenue', value: `$${Number(totalRevenue._sum.amountPaid || 0).toLocaleString()}`, icon: TrendingUp, color: 'text-green-400' },
     ];
 
     return (

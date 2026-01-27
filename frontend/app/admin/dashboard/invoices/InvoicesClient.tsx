@@ -14,10 +14,17 @@ export default function InvoicesClient({ initialInvoices, projects }: { initialI
 
     const handleUpdateStatus = async (id: number, newStatus: string) => {
         try {
+            const body: any = { status: newStatus };
+            // Auto-fill amountPaid if marked as Paid
+            if (newStatus === 'Paid') {
+                const inv = invoices.find(i => i.id === id);
+                if (inv) body.amountPaid = inv.amount;
+            }
+
             const res = await fetch(`/api/invoices/${id}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ status: newStatus }),
+                body: JSON.stringify(body),
             });
             if (res.ok) {
                 const { invoice } = await res.json();
@@ -25,6 +32,23 @@ export default function InvoicesClient({ initialInvoices, projects }: { initialI
                 if (newStatus === 'Paid' || newStatus === 'Partially Paid') {
                     alert('Status updated! A project has been automatically initialized if not already present.');
                 }
+                router.refresh();
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const handleUpdateAmountPaid = async (id: number, amount: string) => {
+        try {
+            const res = await fetch(`/api/invoices/${id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ amountPaid: amount }),
+            });
+            if (res.ok) {
+                const { invoice } = await res.json();
+                setInvoices(invoices.map(i => i.id === id ? { ...i, ...invoice } : i));
                 router.refresh();
             }
         } catch (error) {
@@ -107,19 +131,41 @@ export default function InvoicesClient({ initialInvoices, projects }: { initialI
                                         </div>
                                     </td>
                                     <td className="px-8 py-7 text-right">
-                                        <div className="text-white font-black text-xl tracking-tighter">RM {Number(i.amount).toLocaleString()}</div>
+                                        <div className="flex flex-col items-end">
+                                            <div className="text-white font-black text-xl tracking-tighter">RM {(Number(i.amount) - Number(i.amountPaid || 0)).toLocaleString()}</div>
+                                            {Number(i.amountPaid) > 0 && (
+                                                <div className="text-[10px] text-emerald-500 font-bold uppercase tracking-widest mt-1">
+                                                    Paid: RM {Number(i.amountPaid).toLocaleString()}
+                                                </div>
+                                            )}
+                                        </div>
                                     </td>
                                     <td className="px-8 py-7">
-                                        <select
-                                            value={i.status}
-                                            onChange={(e) => handleUpdateStatus(i.id, e.target.value)}
-                                            className={`px-3 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border outline-none bg-transparent cursor-pointer transition-all ${getStatusStyle(i.status)}`}
-                                        >
-                                            <option value="Pending" className="bg-gray-800 text-white">Pending</option>
-                                            <option value="Partially Paid" className="bg-gray-800 text-white">Partially Paid</option>
-                                            <option value="Paid" className="bg-gray-800 text-white">Fully Paid</option>
-                                            <option value="Overdue" className="bg-gray-800 text-white">Overdue</option>
-                                        </select>
+                                        <div className="space-y-2">
+                                            <select
+                                                value={i.status}
+                                                onChange={(e) => handleUpdateStatus(i.id, e.target.value)}
+                                                className={`px-3 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border outline-none bg-transparent cursor-pointer transition-all ${getStatusStyle(i.status)}`}
+                                            >
+                                                <option value="Pending" className="bg-gray-800 text-white">Pending</option>
+                                                <option value="Partially Paid" className="bg-gray-800 text-white">Partially Paid</option>
+                                                <option value="Paid" className="bg-gray-800 text-white">Fully Paid</option>
+                                                <option value="Overdue" className="bg-gray-800 text-white">Overdue</option>
+                                            </select>
+
+                                            {i.status === 'Partially Paid' && (
+                                                <div className="relative group/input">
+                                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] text-gray-400 font-black">RM</span>
+                                                    <input
+                                                        type="number"
+                                                        defaultValue={Number(i.amountPaid)}
+                                                        onBlur={(e) => handleUpdateAmountPaid(i.id, e.target.value)}
+                                                        className="w-full bg-gray-900/50 border border-gray-700 rounded-lg py-1.5 pl-8 pr-3 text-[10px] font-bold text-teal-400 outline-none focus:border-emerald-500 transition-all"
+                                                        placeholder="Paid Amt"
+                                                    />
+                                                </div>
+                                            )}
+                                        </div>
                                     </td>
                                     <td className="px-8 py-7">
                                         <div className="text-xs text-gray-400 font-bold">

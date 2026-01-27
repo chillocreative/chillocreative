@@ -163,7 +163,7 @@ export default function ProjectsClient({ initialProjects }: { initialProjects: a
                         <div className="bg-gray-900/60 border-t border-gray-700 px-8 py-5 flex justify-between items-center group-hover:bg-gray-900 transition-colors">
                             <div className="flex items-center space-x-2 text-[10px] text-gray-500 font-bold">
                                 <Clock size={14} className="text-blue-500" />
-                                <span>SYNCED {new Date(p.updatedAt).toLocaleDateString()}</span>
+                                <span>SYNCED {new Date(p.updatedAt).toLocaleDateString('en-GB')}</span>
                             </div>
                             <div className="flex items-center space-x-3">
                                 <button
