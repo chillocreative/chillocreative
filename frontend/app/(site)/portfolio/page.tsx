@@ -124,14 +124,14 @@ export default function PortfolioPage() {
                                         )}
                                     </div>
                                     <div className="p-8 relative">
-                                        <div className="flex justify-between items-end mb-2">
+                                        <div className="flex justify-between items-center mb-2">
                                             <div>
                                                 {project.portfolio?.clientName && (
                                                     <span className="text-xs font-bold text-blue-400 uppercase tracking-widest mb-2 block">{project.portfolio.clientName}</span>
                                                 )}
                                                 <h3 className="text-2xl font-bold text-white group-hover:text-purple-400 transition-colors uppercase tracking-tight">{project.title}</h3>
                                             </div>
-                                            <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-purple-600 group-hover:text-white transition-all transform group-hover:rotate-45">
+                                            <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center shrink-0 group-hover:bg-purple-600 group-hover:text-white transition-all transform group-hover:rotate-45 ml-4">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="7" x2="17" y1="17" y2="7" /><polyline points="7 7 17 7 17 17" /></svg>
                                             </div>
                                         </div>
