@@ -169,50 +169,53 @@ export default function ContactPage() {
                                         />
                                     </div>
                                 </div>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div>
-                                        <label className="block text-sm font-semibold text-gray-300 mb-2 uppercase">Phone Number</label>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+                                    <div className="space-y-2">
+                                        <label className="block text-sm font-semibold text-gray-300 uppercase">Phone Number</label>
                                         <div className="flex gap-2">
-                                            <div className="relative">
+                                            <div className="relative w-32 shrink-0">
                                                 <select
                                                     value={countryCode}
                                                     onChange={(e) => setCountryCode(e.target.value)}
-                                                    className="h-full px-3 pr-8 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all appearance-none cursor-pointer text-sm font-bold"
+                                                    className="w-full h-[54px] pl-4 pr-10 rounded-xl bg-white/5 border border-white/10 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all appearance-none cursor-pointer text-sm font-bold"
                                                 >
                                                     {countries.sort((a, b) => a.name === "Malaysia" ? -1 : b.name === "Malaysia" ? 1 : 0).map((c) => (
                                                         <option key={`${c.iso}-${c.code}`} value={c.code} className="bg-gray-900">
-                                                            {c.flag} {c.iso} {c.code}
+                                                            {c.iso} ({c.code})
                                                         </option>
                                                     ))}
                                                 </select>
-                                                <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
+                                                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
                                             </div>
                                             <input
                                                 required
                                                 type="tel"
-                                                className="flex-1 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all placeholder-gray-500 font-bold"
+                                                className="flex-1 h-[54px] px-4 rounded-xl bg-white/5 border border-white/10 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all placeholder-gray-500 font-bold"
                                                 placeholder="123456789"
                                                 value={phoneNumber}
                                                 onChange={(e) => {
-                                                    const value = e.target.value.replace(/\D/g, ''); // Digits only
+                                                    const value = e.target.value.replace(/\D/g, '');
                                                     setPhoneNumber(value);
                                                 }}
                                             />
                                         </div>
                                     </div>
-                                    <div>
-                                        <label className="block text-sm font-semibold text-gray-300 mb-2 uppercase">Subject</label>
-                                        <select
-                                            className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all [&>option]:bg-gray-900"
-                                            value={formData.service}
-                                            onChange={(e) => setFormData({ ...formData, service: e.target.value })}
-                                        >
-                                            <option>Web Design Project</option>
-                                            <option>Web Application</option>
-                                            <option>Mobile App</option>
-                                            <option>SEO Services</option>
-                                            <option>Other</option>
-                                        </select>
+                                    <div className="space-y-2">
+                                        <label className="block text-sm font-semibold text-gray-300 uppercase">Subject</label>
+                                        <div className="relative">
+                                            <select
+                                                className="w-full h-[54px] px-4 rounded-xl bg-white/5 border border-white/10 text-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all [&>option]:bg-gray-900 appearance-none cursor-pointer"
+                                                value={formData.service}
+                                                onChange={(e) => setFormData({ ...formData, service: e.target.value })}
+                                            >
+                                                <option>Web Design Project</option>
+                                                <option>Web Application</option>
+                                                <option>Mobile App</option>
+                                                <option>SEO Services</option>
+                                                <option>Other</option>
+                                            </select>
+                                            <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                                        </div>
                                     </div>
                                 </div>
                                 <div>
