@@ -19,7 +19,7 @@ import {
     Loader2
 } from 'lucide-react';
 import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import autoTable from 'jspdf-autotable';
 
 const services = [
     {
@@ -118,9 +118,9 @@ export default function QuotePage() {
         const quoteNo = `CQ-${new Date().getTime().toString().slice(-6)}`;
 
         // Brand Color Scheme
-        const BRAND_PURPLE = [147, 51, 234]; // #9333ea
-        const TEXT_DARK = [31, 41, 55];
-        const TEXT_LIGHT = [107, 114, 128];
+        const BRAND_PURPLE: [number, number, number] = [147, 51, 234]; // #9333ea
+        const TEXT_DARK: [number, number, number] = [31, 41, 55];
+        const TEXT_LIGHT: [number, number, number] = [107, 114, 128];
 
         // 1. Sidebar/Header Branding
         doc.setFillColor(BRAND_PURPLE[0], BRAND_PURPLE[1], BRAND_PURPLE[2]);
@@ -175,7 +175,7 @@ export default function QuotePage() {
         // 4. Quotation Table
         const tableData = [
             [
-                { content: service?.name || 'Base Service Package', styles: { fontStyle: 'bold' } },
+                { content: service?.name || 'Base Service Package', styles: { fontStyle: 'bold' as const } },
                 '1',
                 `RM ${service?.basePrice?.toLocaleString() || 0}`
             ],
@@ -189,7 +189,7 @@ export default function QuotePage() {
             })
         ];
 
-        doc.autoTable({
+        autoTable(doc, {
             startY: 100,
             head: [['DESCRIPTION', 'QTY', 'PRICE (RM)']],
             body: tableData,
