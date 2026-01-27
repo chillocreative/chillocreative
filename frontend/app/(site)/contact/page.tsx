@@ -8,10 +8,11 @@ export default function ContactPage() {
     const [formData, setFormData] = useState({
         name: '',
         email: '',
-        phone: '',
         service: 'Web Design Project',
         message: ''
     });
+    const [countryCode, setCountryCode] = useState('+60');
+    const [phoneNumber, setPhoneNumber] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
     const [error, setError] = useState('');
@@ -22,10 +23,15 @@ export default function ContactPage() {
         setError('');
 
         try {
+            const dataToSubmit = {
+                ...formData,
+                phone: `${countryCode}${phoneNumber}`
+            };
+
             const response = await fetch('/api/leads', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData),
+                body: JSON.stringify(dataToSubmit),
             });
 
             if (!response.ok) {
@@ -34,7 +40,8 @@ export default function ContactPage() {
             }
 
             setIsSuccess(true);
-            setFormData({ name: '', email: '', phone: '', service: 'Web Design Project', message: '' });
+            setFormData({ name: '', email: '', service: 'Web Design Project', message: '' });
+            setPhoneNumber('');
         } catch (err: any) {
             setError(err.message);
         } finally {
@@ -164,13 +171,35 @@ export default function ContactPage() {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div>
                                         <label className="block text-sm font-semibold text-gray-300 mb-2 uppercase">Phone Number</label>
-                                        <input
-                                            type="tel"
-                                            className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all placeholder-gray-500"
-                                            placeholder="+60123456789"
-                                            value={formData.phone}
-                                            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                                        />
+                                        <div className="flex gap-2">
+                                            <div className="relative">
+                                                <select
+                                                    value={countryCode}
+                                                    onChange={(e) => setCountryCode(e.target.value)}
+                                                    className="h-full px-3 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all appearance-none cursor-pointer"
+                                                >
+                                                    <option value="+60">🇲🇾 +60</option>
+                                                    <option value="+65">🇸🇬 +65</option>
+                                                    <option value="+62">🇮🇩 +62</option>
+                                                    <option value="+66">🇹🇭 +66</option>
+                                                    <option value="+673">🇧🇳 +673</option>
+                                                    <option value="+1">🇺🇸 +1</option>
+                                                    <option value="+44">🇬🇧 +44</option>
+                                                    <option value="+61">🇦🇺 +61</option>
+                                                </select>
+                                            </div>
+                                            <input
+                                                required
+                                                type="tel"
+                                                className="flex-1 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all placeholder-gray-500"
+                                                placeholder="123456789"
+                                                value={phoneNumber}
+                                                onChange={(e) => {
+                                                    const value = e.target.value.replace(/\D/g, ''); // Digits only
+                                                    setPhoneNumber(value);
+                                                }}
+                                            />
+                                        </div>
                                     </div>
                                     <div>
                                         <label className="block text-sm font-semibold text-gray-300 mb-2 uppercase">Subject</label>
