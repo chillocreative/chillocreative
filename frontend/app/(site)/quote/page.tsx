@@ -16,7 +16,13 @@ import {
     Smartphone,
     Circle,
     CheckCircle,
-    Loader2
+    Loader2,
+    Globe,
+    Zap,
+    Shield,
+    BarChart,
+    Search,
+    Palette
 } from 'lucide-react';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -24,42 +30,103 @@ import autoTable from 'jspdf-autotable';
 const services = [
     {
         id: 'web-design',
-        name: 'Web Design / Landing Page',
-        basePrice: 1500,
-        icon: Layout,
-        desc: 'Perfect for startups and simple business presence.'
+        name: 'Landing Page / One-Page',
+        basePrice: 1800,
+        icon: Zap,
+        desc: 'Single-page high-conversion landing pages for marketing campaigns.'
     },
     {
         id: 'business-site',
-        name: 'Business Website',
-        basePrice: 2800,
+        name: 'Corporate / Business Website',
+        basePrice: 4500,
         icon: Layout,
-        desc: 'Professional multi-page sites with CMS.'
+        desc: 'Multi-page professional websites for established businesses.'
     },
     {
         id: 'e-commerce',
         name: 'E-commerce Store',
-        basePrice: 5500,
+        basePrice: 8500,
         icon: ShoppingBag,
-        desc: 'Sell products with online payments & inventory.'
+        desc: 'Full online store with payment gateway and inventory system.'
     },
     {
         id: 'custom-app',
         name: 'Custom Web Application',
-        basePrice: 12000,
+        basePrice: 25000,
         icon: Cpu,
-        desc: 'Complex portals, SaaS, or enterprise tools.'
+        desc: 'Complex software-as-a-service (SaaS) or enterprise portals.'
+    },
+    {
+        id: 'mobile-app',
+        name: 'Mobile App (iOS/Android)',
+        basePrice: 20000,
+        icon: Smartphone,
+        desc: 'Native or Cross-platform mobile applications for App Store/Play Store.'
+    },
+    {
+        id: 'seo-marketing',
+        name: 'SEO & Performance Marketing',
+        basePrice: 2500,
+        icon: Search,
+        desc: 'Comprehensive search engine optimization and digital strategy.'
+    },
+    {
+        id: 'branding',
+        name: 'Brand Identity & Design',
+        basePrice: 3500,
+        icon: Palette,
+        desc: 'Logo, brand guidelines, and complete visual identity systems.'
     },
 ];
 
-const features = [
-    { id: 'seo', name: 'Advanced SEO Setup', price: 800 },
-    { id: 'copywriting', name: 'Professional Copywriting', price: 1200 },
-    { id: 'booking', name: 'Booking/Appointment System', price: 1500 },
-    { id: 'multi-lang', name: 'Multi-language Support', price: 1000 },
-    { id: 'payment', name: 'Payment Gateway Integration', price: 1000 },
-    { id: 'logo', name: 'Brand Logo Design', price: 500 },
-];
+const featuresConfig: Record<string, { id: string, name: string, price: number }[]> = {
+    'web-design': [
+        { id: 'seo-basic', name: 'SEO Foundation & Analytics', price: 800 },
+        { id: 'copy', name: 'High-Converting Copywriting', price: 1200 },
+        { id: 'chat', name: 'WhatsApp / Live Chat Integration', price: 500 },
+        { id: 'speed', name: 'Performance Optimization', price: 800 }
+    ],
+    'business-site': [
+        { id: 'seo-adv', name: 'Advanced SEO & Google Ranking', price: 2500 },
+        { id: 'booking', name: 'Online Booking/Appointment System', price: 1800 },
+        { id: 'multi-lang', name: 'Multi-language Support (EN/BM/CN)', price: 1500 },
+        { id: 'blog', name: 'Content Management (Blog/News)', price: 800 }
+    ],
+    'e-commerce': [
+        { id: 'gateway', name: 'Multi-gateway Payment (Stripe/PayPal)', price: 1500 },
+        { id: 'shipping', name: 'Shipping & Tax API Integration', price: 1200 },
+        { id: 'pos', name: 'POS & Offline Inventory Sync', price: 3500 },
+        { id: 'loyalty', name: 'Membership & Loyalty System', price: 2000 }
+    ],
+    'custom-app': [
+        { id: 'api', name: 'Third-party API Integration', price: 3000 },
+        { id: 'realtime', name: 'Real-time Dashboards & WebSockets', price: 4500 },
+        { id: 'hosting', name: 'Dedicated Cloud Infrastructure', price: 5000 },
+        { id: 'security', name: 'Advanced Security & Encryption', price: 3500 }
+    ],
+    'mobile-app': [
+        { id: 'push', name: 'Smart Push Notifications', price: 2000 },
+        { id: 'social-login', name: 'Social Login / Firebase Auth', price: 1500 },
+        { id: 'geo', name: 'Geolocation / Maps Tracking', price: 2500 },
+        { id: 'offline', name: 'Offline Data Support', price: 3000 }
+    ],
+    'seo-marketing': [
+        { id: 'local-seo', name: 'Local GMB Optimization', price: 1200 },
+        { id: 'backlinks', name: 'Premium Backlink Strategy', price: 3000 },
+        { id: 'ads', name: 'Meta / Google Ads Management', price: 2500 },
+        { id: 'audit', name: 'Deep Technical Website Audit', price: 1500 }
+    ],
+    'branding': [
+        { id: 'guidelines', name: 'Detailed Brand Style Guide', price: 1500 },
+        { id: 'social-kit', name: 'Social Media Branding Kit', price: 1000 },
+        { id: 'static', name: 'Business Card & Stationery', price: 800 },
+        { id: 'motion', name: 'Brand Motion / Logo Intro', price: 2000 }
+    ],
+    'default': [
+        { id: 'maintenance', name: 'Priority Support & Maintenance', price: 500 },
+        { id: 'domain', name: 'Domain & Premium Hosting', price: 800 }
+    ]
+};
 
 export default function QuotePage() {
     const [step, setStep] = useState(1);
@@ -85,8 +152,14 @@ export default function QuotePage() {
     const calculateTotal = () => {
         const service = services.find(s => s.id === selectedService);
         const servicePrice = service ? service.basePrice : 0;
+
+        const activeFeatures = [
+            ...(featuresConfig[selectedService || ''] || []),
+            ...(featuresConfig['default'] || [])
+        ];
+
         const featuresPrice = selectedFeatures.reduce((acc, featId) => {
-            const feature = features.find(f => f.id === featId);
+            const feature = activeFeatures.find(f => f.id === featId);
             return acc + (feature ? feature.price : 0);
         }, 0);
         return servicePrice + featuresPrice;
@@ -117,6 +190,11 @@ export default function QuotePage() {
         const total = calculateTotal();
         const service = services.find(s => s.id === selectedService);
         const quoteNo = `CQ-${String(finalLeadId || 1).padStart(4, '0')}`;
+
+        const activeFeatures = [
+            ...(featuresConfig[selectedService || ''] || []),
+            ...(featuresConfig['default'] || [])
+        ];
 
         // Brand Color Scheme
         const BRAND_PURPLE: [number, number, number] = [147, 51, 234]; // #9333ea
@@ -181,7 +259,7 @@ export default function QuotePage() {
                 `RM ${service?.basePrice?.toLocaleString() || 0}`
             ],
             ...selectedFeatures.map(fid => {
-                const feat = features.find(f => f.id === fid);
+                const feat = activeFeatures.find(f => f.id === fid);
                 return [
                     feat?.name || '',
                     '1',
@@ -436,7 +514,7 @@ export default function QuotePage() {
                                         <p className="text-gray-400">Customize your package with these optional additions.</p>
                                     </div>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                        {features.map((f) => (
+                                        {[...(featuresConfig[selectedService || ''] || []), ...(featuresConfig['default'] || [])].map((f) => (
                                             <button
                                                 key={f.id}
                                                 onClick={() => toggleFeature(f.id)}
@@ -447,13 +525,13 @@ export default function QuotePage() {
                                             >
                                                 <div className="flex items-center gap-3">
                                                     {selectedFeatures.includes(f.id) ? <CheckCircle className="w-5 h-5 text-emerald-500" /> : <Circle className="w-5 h-5 text-gray-500" />}
-                                                    <span className="font-medium">{f.name}</span>
+                                                    <span className="font-medium text-sm">{f.name}</span>
                                                 </div>
-                                                <span className="text-sm text-gray-400">+RM {f.price}</span>
+                                                <span className="text-xs font-bold text-gray-400">+RM {f.price.toLocaleString()}</span>
                                             </button>
                                         ))}
                                     </div>
-                                    <div className="bg-purple-600/10 p-6 rounded-2xl flex items-center justify-between border border-purple-500/20 mb-8">
+                                    <div className="bg-purple-600/10 p-6 rounded-2xl flex items-center justify-between border border-purple-500/20 mb-8 mt-4">
                                         <div>
                                             <p className="text-sm text-purple-400 uppercase font-bold">Estimated Total</p>
                                             <p className="text-3xl font-bold">RM {calculateTotal().toLocaleString()}</p>
@@ -463,11 +541,10 @@ export default function QuotePage() {
                                     <div className="flex gap-4">
                                         <button onClick={() => setStep(2)} className="flex-1 py-4 border border-white/10 rounded-xl font-bold uppercase hover:bg-white/5 transition-all">Back</button>
                                         <button
-                                            onClick={handleFinalSubmit}
-                                            disabled={isSubmitting}
+                                            onClick={() => setStep(4)}
                                             className="flex-2 py-4 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl font-bold uppercase px-12 transition-all flex items-center justify-center gap-2"
                                         >
-                                            {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Finalize Quote'}
+                                            Next Step <ArrowRight className="w-5 h-5" />
                                         </button>
                                     </div>
                                 </motion.div>
@@ -505,22 +582,24 @@ export default function QuotePage() {
                                                 value={projectDescription}
                                                 onChange={(e) => setProjectDescription(e.target.value)}
                                             />
-                                            <div className="flex gap-4">
-                                                <button onClick={() => setStep(3)} className="flex-1 py-4 border border-white/10 rounded-xl font-bold uppercase hover:bg-white/5 transition-all">Back</button>
+                                            <div className="space-y-6 max-w-lg mx-auto">
                                                 <button
                                                     onClick={() => {
                                                         setIsAnalyzing(true);
                                                         setTimeout(() => {
                                                             setIsAnalyzing(false);
                                                             handleFinalSubmit();
-                                                        }, 3000);
+                                                        }, 3500);
                                                     }}
                                                     disabled={!projectDescription}
-                                                    className="flex-2 py-4 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl font-bold uppercase px-12 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                                                    className="w-full py-5 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 rounded-2xl font-bold uppercase hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(168,85,247,0.4)] transition-all flex items-center justify-center gap-3 disabled:opacity-50 text-xl tracking-wider shadow-lg"
                                                 >
-                                                    Generate Quote <FileText className="w-5 h-5" />
+                                                    Analyze & Generate Quote <Cpu className="w-6 h-6" />
                                                 </button>
-                                            </div >
+                                                <button onClick={() => setStep(3)} className="w-full py-2 text-gray-500 hover:text-white transition-all font-bold uppercase text-xs tracking-widest">
+                                                    &larr; Go Back & Refine Features
+                                                </button>
+                                            </div>
                                         </>
                                     )}
                                 </motion.div>
@@ -565,8 +644,8 @@ export default function QuotePage() {
                             )}
                         </AnimatePresence>
                     </div>
-                </div>
-            </div>
-        </div>
+                </div >
+            </div >
+        </div >
     );
 }
