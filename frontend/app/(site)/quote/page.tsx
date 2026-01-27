@@ -74,6 +74,7 @@ export default function QuotePage() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [quoteGenerated, setQuoteGenerated] = useState(false);
+    const [finalLeadId, setFinalLeadId] = useState<number | null>(null);
 
     const toggleFeature = (id: string) => {
         setSelectedFeatures(prev =>
@@ -115,7 +116,7 @@ export default function QuotePage() {
         const doc = new jsPDF() as any;
         const total = calculateTotal();
         const service = services.find(s => s.id === selectedService);
-        const quoteNo = `CQ-${new Date().getTime().toString().slice(-6)}`;
+        const quoteNo = finalLeadId ? `CQ-${finalLeadId.toString().padStart(4, '0')}` : `CQ-${new Date().getTime().toString().slice(-4)}`;
 
         // Brand Color Scheme
         const BRAND_PURPLE: [number, number, number] = [147, 51, 234]; // #9333ea
@@ -153,7 +154,7 @@ export default function QuotePage() {
         doc.setTextColor(TEXT_LIGHT[0], TEXT_LIGHT[1], TEXT_LIGHT[2]);
         doc.text(`Quotation No: ${quoteNo}`, 15, 72);
         doc.text(`Date Issued: ${new Date().toLocaleDateString('en-MY', { day: 'numeric', month: 'long', year: 'numeric' })}`, 15, 77);
-        doc.text(`Valid Until: ${new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toLocaleDateString()}`, 15, 82);
+        doc.text(`Valid For: 30 Days`, 15, 82);
 
         // 3. Client Details (Box Styling)
         doc.setFillColor(249, 250, 251);
@@ -264,7 +265,7 @@ export default function QuotePage() {
         const selectedFeatsNames = selectedFeatures.map(fid => features.find(f => f.id === fid)?.name).join(', ');
 
         try {
-            await fetch('/api/leads', {
+            const response = await fetch('/api/leads', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -273,6 +274,10 @@ export default function QuotePage() {
                     message: `[AI ANALYZED QUOTE] Total: RM ${total}. \nFeatures: ${selectedFeatsNames} \nClient Description: ${projectDescription}`
                 }),
             });
+            const data = await response.json();
+            if (data.lead?.id) {
+                setFinalLeadId(data.lead.id);
+            }
             setQuoteGenerated(true);
             setStep(5);
         } catch (e) {
@@ -532,7 +537,9 @@ export default function QuotePage() {
                                     </div>
                                     <div>
                                         <h3 className="text-3xl font-bold uppercase italic mb-2">Quote Ready!</h3>
-                                        <p className="text-gray-400 max-w-sm mx-auto">Your customized quotation is ready for download. Our team will also contact you to discuss further.</p>
+                                        <p className="text-gray-400 max-w-sm mx-auto">
+                                            Your customized quotation {finalLeadId ? `#CQ-${finalLeadId.toString().padStart(4, '0')}` : ''} is ready for download. Our team will also contact you to discuss further.
+                                        </p>
                                     </div>
 
                                     <div className="bg-white/5 border border-white/10 rounded-2xl p-8 max-w-md mx-auto">
