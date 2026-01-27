@@ -340,7 +340,11 @@ export default function QuotePage() {
         setIsSubmitting(true);
         const total = calculateTotal();
         const service = services.find(s => s.id === selectedService);
-        const selectedFeatsNames = selectedFeatures.map(fid => features.find(f => f.id === fid)?.name).join(', ');
+        const activeFeatures = [
+            ...(featuresConfig[selectedService || ''] || []),
+            ...(featuresConfig['default'] || [])
+        ];
+        const selectedFeatsNames = selectedFeatures.map(fid => activeFeatures.find(f => f.id === fid)?.name).join(', ');
 
         try {
             const response = await fetch('/api/leads', {
