@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Mail, Phone, MapPin, Facebook, Instagram, Loader2, CheckCircle2 } from 'lucide-react';
+import { Mail, Phone, MapPin, Facebook, Instagram, Loader2, CheckCircle2, ChevronDown, Search } from 'lucide-react';
+import { countries } from '@/lib/countries';
 
 export default function ContactPage() {
     const [formData, setFormData] = useState({
@@ -176,22 +177,20 @@ export default function ContactPage() {
                                                 <select
                                                     value={countryCode}
                                                     onChange={(e) => setCountryCode(e.target.value)}
-                                                    className="h-full px-3 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all appearance-none cursor-pointer"
+                                                    className="h-full px-3 pr-8 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all appearance-none cursor-pointer text-sm font-bold"
                                                 >
-                                                    <option value="+60">🇲🇾 +60</option>
-                                                    <option value="+65">🇸🇬 +65</option>
-                                                    <option value="+62">🇮🇩 +62</option>
-                                                    <option value="+66">🇹🇭 +66</option>
-                                                    <option value="+673">🇧🇳 +673</option>
-                                                    <option value="+1">🇺🇸 +1</option>
-                                                    <option value="+44">🇬🇧 +44</option>
-                                                    <option value="+61">🇦🇺 +61</option>
+                                                    {countries.sort((a, b) => a.name === "Malaysia" ? -1 : b.name === "Malaysia" ? 1 : 0).map((c) => (
+                                                        <option key={`${c.iso}-${c.code}`} value={c.code} className="bg-gray-900">
+                                                            {c.flag} {c.iso} {c.code}
+                                                        </option>
+                                                    ))}
                                                 </select>
+                                                <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
                                             </div>
                                             <input
                                                 required
                                                 type="tel"
-                                                className="flex-1 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all placeholder-gray-500"
+                                                className="flex-1 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all placeholder-gray-500 font-bold"
                                                 placeholder="123456789"
                                                 value={phoneNumber}
                                                 onChange={(e) => {
