@@ -39,4 +39,4 @@ frontend/next-env.d.ts
 
 # Large deployment artifacts
 *.zip
-README_DEPLOY.md
+
