@@ -116,7 +116,7 @@ export default function QuotePage() {
         const doc = new jsPDF() as any;
         const total = calculateTotal();
         const service = services.find(s => s.id === selectedService);
-        const quoteNo = finalLeadId ? `CQ-${finalLeadId.toString().padStart(4, '0')}` : `CQ-${new Date().getTime().toString().slice(-4)}`;
+        const quoteNo = `CQ-${String(finalLeadId || 1).padStart(4, '0')}`;
 
         // Brand Color Scheme
         const BRAND_PURPLE: [number, number, number] = [147, 51, 234]; // #9333ea
@@ -276,6 +276,7 @@ export default function QuotePage() {
             });
             const data = await response.json();
             if (data.lead?.id) {
+                console.log('Quotation Generated with ID:', data.lead.id);
                 setFinalLeadId(data.lead.id);
             }
             setQuoteGenerated(true);
