@@ -1,3 +1,4 @@
+// Deployment Automation Test - 2026-01-28
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
