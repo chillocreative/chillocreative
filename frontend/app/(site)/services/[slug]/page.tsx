@@ -141,9 +141,9 @@ export default function SingleServicePage() {
                                     </Link>
                                     <Link
                                         href="/quote"
-                                        className="flex items-center justify-center gap-3 w-full py-4 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-2xl font-bold hover:shadow-[0_0_20px_rgba(6,182,212,0.4)] transition-all transform hover:scale-[1.02]"
+                                        className="flex items-center justify-center gap-3 w-full py-4 bg-gradient-to-br from-gray-900 via-slate-900 to-black text-white rounded-2xl font-bold border border-white/10 hover:border-purple-500/50 hover:shadow-[0_0_20px_rgba(168,85,247,0.15)] transition-all transform hover:scale-[1.02]"
                                     >
-                                        Request for Quotation
+                                        QUOTATION
                                         <FileText className="w-4 h-4" />
                                     </Link>
                                 </div>
