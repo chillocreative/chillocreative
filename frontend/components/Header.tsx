@@ -85,6 +85,10 @@ const Header = () => {
               Portfolio
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-purple-400 transition-all group-hover:w-full"></span>
             </Link>
+            <Link href="/quote" className="text-sm font-medium hover:text-purple-300 transition-colors relative group">
+              Instant Quote
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-purple-400 transition-all group-hover:w-full"></span>
+            </Link>
             <Link href="/contact" className="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full hover:shadow-[0_0_20px_rgba(168,85,247,0.5)] transition-all font-medium text-sm transform hover:scale-105">
               Let&apos;s Talk
             </Link>
@@ -148,6 +152,13 @@ const Header = () => {
             onClick={closeMobileMenu}
           >
             Portfolio
+          </Link>
+          <Link
+            href="/quote"
+            className="text-lg font-medium hover:text-purple-300 transition-colors py-3 px-4 rounded-xl hover:bg-white/5"
+            onClick={closeMobileMenu}
+          >
+            Instant Quote
           </Link>
           <div className="h-px bg-white/10 my-2" />
           <Link
