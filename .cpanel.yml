@@ -1,0 +1,9 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/$(whoami)/public_html/
+    - /bin/cp -R wordpress/* $DEPLOYPATH/wordpress/
+    - /bin/cp -R frontend/.next $DEPLOYPATH/frontend/.next
+    - /bin/cp frontend/package.json $DEPLOYPATH/frontend/package.json
+    - /bin/cp frontend/server.js $DEPLOYPATH/frontend/server.js
+    - /bin/cp frontend/.env.production $DEPLOYPATH/frontend/.env.production
