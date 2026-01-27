@@ -15,12 +15,6 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  experimental: {
-    // This silences the warning about multiple lockfiles by explicitly defining the project root
-    turbo: {
-      root: './',
-    },
-  } as any,
 };
 
 export default nextConfig;
