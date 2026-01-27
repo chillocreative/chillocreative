@@ -6,7 +6,7 @@ import { fetchGraphQL } from '@/lib/api';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowLeft, Send } from 'lucide-react';
+import { ArrowLeft, Send, FileText } from 'lucide-react';
 
 interface WordPressService {
     title: string;
@@ -141,9 +141,10 @@ export default function SingleServicePage() {
                                     </Link>
                                     <Link
                                         href="/quote"
-                                        className="flex items-center justify-center gap-3 w-full py-4 bg-white/5 border border-white/10 text-white rounded-2xl font-bold hover:bg-white/10 transition-all transform hover:scale-[1.02]"
+                                        className="flex items-center justify-center gap-3 w-full py-4 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-2xl font-bold hover:shadow-[0_0_20px_rgba(6,182,212,0.4)] transition-all transform hover:scale-[1.02]"
                                     >
                                         Request for Quotation
+                                        <FileText className="w-4 h-4" />
                                     </Link>
                                 </div>
 
