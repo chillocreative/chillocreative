@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 46, "column": 0}, "map": {"version":3,"sources":["file:///D:/laragon/www/chillocreative/frontend/app/api/auth/logout/route.ts"],"sourcesContent":["import { NextResponse } from 'next/server';\r\nimport { cookies } from 'next/headers';\r\n\r\nexport async function GET() {\r\n    const cookieStore = await cookies();\r\n    cookieStore.delete('admin_token');\r\n\r\n    return NextResponse.redirect(new URL('/admin', process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'));\r\n}\r\n"],"names":[],"mappings":";;;;AAAA;AACA;;;AAEO,eAAe;IAClB,MAAM,cAAc,MAAM,IAAA,4IAAO;IACjC,YAAY,MAAM,CAAC;IAEnB,OAAO,gJAAY,CAAC,QAAQ,CAAC,IAAI,IAAI,UAAU,QAAQ,GAAG,CAAC,oBAAoB,IAAI;AACvF"}}]
+}
