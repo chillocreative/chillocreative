@@ -175,7 +175,7 @@ export default function ContactPage() {
                                             required
                                             type="tel"
                                             className="w-full h-[56px] px-4 rounded-xl bg-white/5 border border-white/10 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all placeholder-gray-500 font-bold"
-                                            placeholder="+6..."
+                                            placeholder="+60123456789"
                                             value={phoneNumber}
                                             onChange={(e) => {
                                                 // Allow digits and the + sign
