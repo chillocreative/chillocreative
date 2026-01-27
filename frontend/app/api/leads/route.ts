@@ -22,6 +22,16 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Name and email are required' }, { status: 400 });
         }
 
+        // If this is a final quote submission, cleanup the temporary "Initiated" lead
+        if (service !== 'Quote Initiated') {
+            await prisma.lead.deleteMany({
+                where: {
+                    email,
+                    service: 'Quote Initiated'
+                }
+            });
+        }
+
         const lead = await prisma.lead.create({
             data: {
                 name,

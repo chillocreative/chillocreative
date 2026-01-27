@@ -230,8 +230,8 @@ export default function QuotePage() {
         doc.setFontSize(14);
         doc.setFont(undefined, 'bold');
         doc.setTextColor(BRAND_PURPLE[0], BRAND_PURPLE[1], BRAND_PURPLE[2]);
-        doc.text('TOTAL:', 140, finalY + 20);
-        doc.text(`RM ${total.toLocaleString()}`, 175, finalY + 20, { align: 'right' });
+        doc.text('TOTAL:', 135, finalY + 20); // Moved left slightly
+        doc.text(`RM ${total.toLocaleString()}`, 190, finalY + 20, { align: 'right' }); // Moved right slightly
 
         // 6. Footer & Terms
         const pageHeight = doc.internal.pageSize.height;
@@ -245,7 +245,7 @@ export default function QuotePage() {
 
         doc.setFontSize(8);
         doc.setTextColor(TEXT_LIGHT[0], TEXT_LIGHT[1], TEXT_LIGHT[2]);
-        doc.text('1. Payment: 50% deposit required to commence work.', 15, pageHeight - 34);
+        doc.text('1. Payment: will be discussed further.', 15, pageHeight - 34);
         doc.text('2. This is a system-generated estimate based on your selections.', 15, pageHeight - 30);
         doc.text('3. Full ownership of assets is transferred upon final payment.', 15, pageHeight - 26);
 
@@ -459,7 +459,7 @@ export default function QuotePage() {
                                         <button
                                             onClick={handleFinalSubmit}
                                             disabled={isSubmitting}
-                                            className="flex-2 py-4 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl font-bold uppercase px-12 transition-all flex items-center gap-2"
+                                            className="flex-2 py-4 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl font-bold uppercase px-12 transition-all flex items-center justify-center gap-2"
                                         >
                                             {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Finalize Quote'}
                                         </button>
