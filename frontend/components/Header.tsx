@@ -68,7 +68,7 @@ const Header = () => {
               className="h-16 w-auto mix-blend-screen object-contain rounded-full brightness-125 hover:brightness-150 transition-all"
             />
             <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-400">
-              Chillo Creative ✨
+              Chillo Creative
             </span>
           </Link>
 
