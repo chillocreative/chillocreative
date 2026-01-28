@@ -61,7 +61,7 @@ export default function BackToTop() {
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
                     onClick={scrollToTop}
-                    className="fixed bottom-6 right-6 md:bottom-20 md:right-10 z-[999] p-3 md:p-4 bg-gradient-to-br from-purple-600 via-blue-600 to-teal-500 text-white rounded-xl md:rounded-2xl shadow-[0_10px_40px_-10px_rgba(79,70,229,0.5)] hover:shadow-[0_20px_50px_-10px_rgba(79,70,229,0.7)] transition-all border border-white/20 group backdrop-blur-md"
+                    className="fixed bottom-10 right-6 md:bottom-32 md:right-10 z-[999] p-3 md:p-4 bg-gradient-to-br from-purple-600 via-blue-600 to-teal-500 text-white rounded-xl md:rounded-2xl shadow-[0_10px_40px_-10px_rgba(79,70,229,0.5)] hover:shadow-[0_20px_50px_-10px_rgba(79,70,229,0.7)] transition-all border border-white/20 group backdrop-blur-md"
                 >
                     <ChevronUp size={24} strokeWidth={3} className="group-hover:animate-bounce w-5 h-5 md:w-6 md:h-6" />
 
