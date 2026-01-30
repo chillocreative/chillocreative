@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -28,7 +28,39 @@ const navItems = [
 
 export default function AdminShell({ children }: { children: React.ReactNode }) {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [adminName, setAdminName] = useState('Admin');
+    const [adminInitials, setAdminInitials] = useState('AD');
     const pathname = usePathname();
+
+    const fetchProfile = async () => {
+        try {
+            const res = await fetch('/api/admin/profile');
+            if (res.ok) {
+                const data = await res.json();
+                const name = data.name || data.username || 'Admin';
+                setAdminName(name);
+                // Get initials from name
+                const initials = name
+                    .split(' ')
+                    .map((n: string) => n[0])
+                    .join('')
+                    .substring(0, 2)
+                    .toUpperCase();
+                setAdminInitials(initials);
+            }
+        } catch (error) {
+            console.error('Failed to fetch profile in shell:', error);
+        }
+    };
+
+    useEffect(() => {
+        fetchProfile();
+
+        // Listen for profile updates from other components
+        const handleProfileUpdate = () => fetchProfile();
+        window.addEventListener('profileUpdated', handleProfileUpdate);
+        return () => window.removeEventListener('profileUpdated', handleProfileUpdate);
+    }, []);
 
     const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
 
@@ -56,8 +88,8 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
                                 key={item.name}
                                 href={item.href}
                                 className={`flex items-center justify-between p-4 rounded-2xl transition-all group ${isActive
-                                        ? 'bg-gradient-to-r from-purple-600/10 to-blue-600/10 text-white border border-purple-500/30 shadow-inner'
-                                        : 'text-gray-500 hover:text-white hover:bg-white/5 border border-transparent'
+                                    ? 'bg-gradient-to-r from-purple-600/10 to-blue-600/10 text-white border border-purple-500/30 shadow-inner'
+                                    : 'text-gray-500 hover:text-white hover:bg-white/5 border border-transparent'
                                     }`}
                             >
                                 <div className="flex items-center space-x-3">
@@ -103,13 +135,13 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
 
                     <div className="flex items-center space-x-4">
                         <div className="hidden sm:flex flex-col items-end mr-2 text-right">
-                            <span className="text-xs font-black uppercase tracking-widest leading-none">Rahim Admin</span>
+                            <span className="text-xs font-black uppercase tracking-widest leading-none">{adminName}</span>
                             <span className="text-[9px] font-bold text-emerald-400 tracking-widest uppercase mt-1">Status: Online</span>
                         </div>
                         <div className="relative group">
                             <div className="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center p-[2px] shadow-xl group-hover:scale-105 transition-transform duration-300">
-                                <div className="w-full h-full rounded-[14px] bg-gray-900 flex items-center justify-center text-xs md:text-sm font-black text-white">
-                                    RA
+                                <div className="w-full h-full rounded-[14px] bg-gray-900 flex items-center justify-center text-xs md:text-sm font-black text-white uppercase">
+                                    {adminInitials}
                                 </div>
                             </div>
                             {/* Fast Action Ring */}
@@ -157,8 +189,8 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
                                                 href={item.href}
                                                 onClick={toggleMobileMenu}
                                                 className={`flex items-center space-x-4 p-4 rounded-2xl transition-all ${isActive
-                                                        ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/30'
-                                                        : 'text-gray-400 hover:text-white hover:bg-white/5'
+                                                    ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/30'
+                                                    : 'text-gray-400 hover:text-white hover:bg-white/5'
                                                     }`}
                                             >
                                                 <item.icon size={20} />

@@ -342,9 +342,10 @@ export default function QuotePage() {
 
         doc.setFontSize(8);
         doc.setTextColor(TEXT_LIGHT[0], TEXT_LIGHT[1], TEXT_LIGHT[2]);
-        doc.text('1. Payment: will be discussed further.', 15, pageHeight - 34);
-        doc.text('2. This is a system-generated estimate based on your selections.', 15, pageHeight - 30);
-        doc.text('3. Full ownership of assets is transferred upon final payment.', 15, pageHeight - 26);
+        doc.text('1. Price given is ESTIMATION PRICE ONLY. Exact price please contact us.', 15, pageHeight - 36);
+        doc.text('2. Payment Terms: will be discussed further.', 15, pageHeight - 32);
+        doc.text('3. This is a system-generated estimate based on your selections.', 15, pageHeight - 28);
+        doc.text('4. Full ownership of assets is transferred upon final payment.', 15, pageHeight - 24);
 
         doc.setFontSize(12);
         doc.setFont(undefined, 'italic');
@@ -651,8 +652,8 @@ export default function QuotePage() {
                                     </div>
                                     <div>
                                         <h3 className="text-3xl font-bold uppercase italic mb-2">Quote Ready!</h3>
-                                        <p className="text-gray-400 max-w-sm mx-auto">
-                                            Your customized quotation {finalLeadId ? `#CQ-${finalLeadId.toString().padStart(4, '0')}` : ''} is ready for download. Our team will also contact you to discuss further.
+                                        <p className="text-gray-400 max-w-lg mx-auto leading-relaxed">
+                                            Your customized quotation {finalLeadId ? `#CQ-${finalLeadId.toString().padStart(4, '0')}` : ''} is ready for download. <span className="text-purple-400 font-bold">Price given is just an ESTIMATION PRICE ONLY.</span> Please contact us for exact price. Our team will also contact you to discuss further.
                                         </p>
                                     </div>
 

@@ -196,6 +196,7 @@ export default function ContactPage() {
                                                 <option>Web Application</option>
                                                 <option>Mobile App</option>
                                                 <option>SEO Services</option>
+                                                <option>AI Training Course</option>
                                                 <option>Other</option>
                                             </select>
                                             <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />

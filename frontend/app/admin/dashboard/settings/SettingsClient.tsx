@@ -1,23 +1,105 @@
 'use client';
 
-import { useState } from 'react';
-import { User, Lock, Bell, Globe, Database, Shield, Save, Key, AppWindow, Receipt } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { User, Lock, Bell, Globe, Database, Shield, Save, Key, AppWindow, Receipt, Loader2, CheckCircle } from 'lucide-react';
 
 export default function SettingsClient() {
     const [activeTab, setActiveTab] = useState('account');
+    const [isLoading, setIsLoading] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
+    const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+
+    // Account State
+    const [profile, setProfile] = useState({
+        name: '',
+        username: '',
+        email: '',
+        role: ''
+    });
+
+    useEffect(() => {
+        const fetchProfile = async () => {
+            setIsLoading(true);
+            try {
+                const res = await fetch('/api/admin/profile');
+                if (res.ok) {
+                    const data = await res.json();
+                    setProfile({
+                        name: data.name || '',
+                        username: data.username || '',
+                        email: data.email || '',
+                        role: data.role || ''
+                    });
+                }
+            } catch (error) {
+                console.error('Failed to fetch profile:', error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchProfile();
+    }, []);
+
+    const handleSaveAccount = async () => {
+        setIsSaving(true);
+        setMessage(null);
+        try {
+            const res = await fetch('/api/admin/profile', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: profile.name,
+                    username: profile.username,
+                    email: profile.email
+                }),
+            });
+
+            const data = await res.json();
+
+            if (res.ok) {
+                setMessage({ type: 'success', text: 'Settings saved successfully!' });
+                setProfile({
+                    name: data.name,
+                    username: data.username,
+                    email: data.email,
+                    role: data.role
+                });
+                // Update AdminShell and other components
+                window.dispatchEvent(new Event('profileUpdated'));
+            } else {
+                setMessage({ type: 'error', text: data.error || 'Failed to save settings' });
+            }
+        } catch (error) {
+            setMessage({ type: 'error', text: 'An unexpected error occurred' });
+        } finally {
+            setIsSaving(false);
+            // Clear message after 3 seconds
+            setTimeout(() => setMessage(null), 3000);
+        }
+    };
 
     const renderContent = () => {
+        if (isLoading) {
+            return (
+                <div className="flex flex-col items-center justify-center py-20 space-y-4">
+                    <Loader2 className="w-10 h-10 text-purple-500 animate-spin" />
+                    <p className="text-gray-400 font-bold uppercase tracking-widest text-xs">Loading Settings...</p>
+                </div>
+            );
+        }
+
         switch (activeTab) {
             case 'account':
                 return (
                     <section className="bg-gray-800 rounded-2xl border border-gray-700 shadow-xl p-8 space-y-6 animate-in fade-in duration-300">
                         <div className="flex items-center space-x-4 border-b border-gray-700 pb-6">
                             <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-2xl font-bold shadow-lg">
-                                RA
+                                {profile.name ? profile.name.substring(0, 2).toUpperCase() : 'RA'}
                             </div>
                             <div>
-                                <h3 className="text-xl font-bold text-white uppercase tracking-tight">Rahim Admin</h3>
-                                <p className="text-gray-500 text-sm">System Administrator</p>
+                                <h3 className="text-xl font-bold text-white uppercase tracking-tight">{profile.name || 'Rahim Admin'}</h3>
+                                <p className="text-gray-500 text-sm capitalize">{profile.role || 'System Administrator'}</p>
                                 <button className="mt-2 text-xs font-bold text-purple-400 hover:text-purple-300 transition-colors uppercase">Change Avatar</button>
                             </div>
                         </div>
@@ -25,22 +107,48 @@ export default function SettingsClient() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="space-y-2">
                                 <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Full Name</label>
-                                <input type="text" defaultValue="Rahim Admin" className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-purple-500 outline-none transition-all" />
+                                <input
+                                    type="text"
+                                    value={profile.name}
+                                    onChange={(e) => setProfile({ ...profile, name: e.target.value })}
+                                    className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-purple-500 outline-none transition-all"
+                                />
                             </div>
                             <div className="space-y-2">
                                 <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Username</label>
-                                <input type="text" defaultValue="rahim" className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-purple-500 outline-none transition-all" />
+                                <input
+                                    type="text"
+                                    value={profile.username}
+                                    onChange={(e) => setProfile({ ...profile, username: e.target.value })}
+                                    className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-purple-500 outline-none transition-all"
+                                />
                             </div>
                             <div className="space-y-2 md:col-span-2">
                                 <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Email Address</label>
-                                <input type="email" defaultValue="admin@chillocreative.com" className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-purple-500 outline-none transition-all" />
+                                <input
+                                    type="email"
+                                    value={profile.email}
+                                    onChange={(e) => setProfile({ ...profile, email: e.target.value })}
+                                    className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-purple-500 outline-none transition-all"
+                                />
                             </div>
                         </div>
 
+                        {message && (
+                            <div className={`p-4 rounded-xl flex items-center gap-3 animate-in slide-in-from-top-2 duration-300 ${message.type === 'success' ? 'bg-green-500/10 text-green-400 border border-green-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'}`}>
+                                {message.type === 'success' ? <CheckCircle size={18} /> : <Shield size={18} />}
+                                <span className="text-sm font-bold uppercase tracking-wide">{message.text}</span>
+                            </div>
+                        )}
+
                         <div className="pt-6 border-t border-gray-700 flex justify-end">
-                            <button className="flex items-center space-x-2 px-6 py-2.5 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-xl font-bold hover:from-purple-700 hover:to-blue-700 transition-all shadow-lg">
-                                <Save size={18} />
-                                <span>Save Changes</span>
+                            <button
+                                onClick={handleSaveAccount}
+                                disabled={isSaving}
+                                className="flex items-center space-x-2 px-6 py-2.5 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-xl font-bold hover:from-purple-700 hover:to-blue-700 transition-all shadow-lg disabled:opacity-50"
+                            >
+                                {isSaving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
+                                <span>{isSaving ? 'Saving...' : 'Save Changes'}</span>
                             </button>
                         </div>
                     </section>
@@ -182,8 +290,8 @@ export default function SettingsClient() {
                         key={item.id}
                         onClick={() => setActiveTab(item.id)}
                         className={`w-full flex items-center space-x-3 p-4 rounded-xl transition-all font-bold uppercase text-xs tracking-widest ${activeTab === item.id
-                                ? 'bg-purple-600 text-white shadow-lg shadow-purple-900/20'
-                                : 'text-gray-400 hover:bg-gray-800 hover:text-white'
+                            ? 'bg-purple-600 text-white shadow-lg shadow-purple-900/20'
+                            : 'text-gray-400 hover:bg-gray-800 hover:text-white'
                             }`}
                     >
                         <item.icon size={18} />
