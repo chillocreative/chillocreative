@@ -22,7 +22,8 @@ import {
     Shield,
     BarChart,
     Search,
-    Palette
+    Palette,
+    Brain
 } from 'lucide-react';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -77,6 +78,13 @@ const services = [
         icon: Palette,
         desc: 'Logo, brand guidelines, and complete visual identity systems.'
     },
+    {
+        id: 'ai-training',
+        name: 'AI Training Course',
+        basePrice: 2000,
+        icon: Brain,
+        desc: 'Specialized training sessions for your team to master AI productivity tools.'
+    },
 ];
 
 const featuresConfig: Record<string, { id: string, name: string, price: number }[]> = {
@@ -121,6 +129,11 @@ const featuresConfig: Record<string, { id: string, name: string, price: number }
         { id: 'social-kit', name: 'Social Media Branding Kit', price: 1000 },
         { id: 'static', name: 'Business Card & Stationery', price: 800 },
         { id: 'motion', name: 'Brand Motion / Logo Intro', price: 2000 }
+    ],
+    'ai-training': [
+        { id: 'prompt-eng', name: 'Advanced Prompt Engineering', price: 1000 },
+        { id: 'ai-workflow', name: 'AI Workflow Automation', price: 1500 },
+        { id: 'ai-tools', name: 'Custom AI Tool Selection', price: 800 }
     ],
     'default': [
         { id: 'maintenance', name: 'Priority Support & Maintenance', price: 500 },

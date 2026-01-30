@@ -35,5 +35,11 @@ export const services: Service[] = [
         title: 'SEO',
         description: 'Data-driven strategies to improve your visibility and drive organic traffic to your site.',
         iconName: 'Search'
+    },
+    {
+        id: 'ai-training',
+        title: 'AI Training Course',
+        description: 'Empower your team with the latest AI tools and techniques to boost productivity and innovation.',
+        iconName: 'Brain'
     }
 ];

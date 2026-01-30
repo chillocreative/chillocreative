@@ -160,6 +160,13 @@ export default function SingleServicePage() {
                                                 {s.title}
                                             </Link>
                                         ))}
+                                        {/* Added AI Training Course manually as requested */}
+                                        <Link
+                                            href="/services/ai-training-course"
+                                            className="text-gray-300 hover:text-purple-400 transition-colors font-bold text-sm"
+                                        >
+                                            AI Training Course
+                                        </Link>
                                     </div>
                                 </div>
                             </div>
