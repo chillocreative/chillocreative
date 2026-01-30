@@ -36,16 +36,7 @@ const Hero = () => {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 1, type: "spring" }}
                 >
-                    <motion.div
-                        className="inline-block mb-6 relative"
-                        whileHover={{ scale: 1.05 }}
-                    >
-                        <span className="relative z-10 py-2 px-6 rounded-full bg-gradient-to-r from-indigo-500/20 to-purple-500/20 border border-white/10 text-sm md:text-base backdrop-blur-md flex items-center gap-2">
-                            <span className="w-2 h-2 rounded-full bg-green-400 animate-ping" />
-                            🚀 Ready to Launch Your Vision
-                        </span>
-                        <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-500 blur-xl opacity-20 rounded-full" />
-                    </motion.div>
+
 
                     <h1 className="text-5xl md:text-7xl lg:text-9xl font-bold mb-8 leading-tight tracking-tight">
                         Design That <br />
