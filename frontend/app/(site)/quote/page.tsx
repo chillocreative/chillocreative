@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     User,
@@ -155,6 +155,11 @@ export default function QuotePage() {
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [quoteGenerated, setQuoteGenerated] = useState(false);
     const [finalLeadId, setFinalLeadId] = useState<number | null>(null);
+
+    // Scroll to top when step changes
+    useEffect(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, [step]);
 
     const toggleFeature = (id: string) => {
         setSelectedFeatures(prev =>
