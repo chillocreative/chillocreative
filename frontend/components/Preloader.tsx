@@ -50,13 +50,14 @@ export default function Preloader() {
                             transition={{ duration: 1, ease: "easeOut" }}
                             className="relative z-10"
                         >
-                            <div className="relative w-32 h-32 md:w-40 md:h-40">
+                            <div className="relative w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden"
+                                style={{ maskImage: 'radial-gradient(circle, black 50%, transparent 70%)', WebkitMaskImage: 'radial-gradient(circle, black 50%, transparent 70%)' }}>
                                 <Image
                                     src="/logo.png"
                                     alt="Chillo Creative"
                                     fill
                                     priority
-                                    className="object-contain drop-shadow-[0_0_20px_rgba(34,211,238,0.8)] mix-blend-screen"
+                                    className="object-contain drop-shadow-[0_0_20px_rgba(34,211,238,0.8)] mix-blend-screen contrast-[1.2]"
                                 />
                             </div>
                         </motion.div>
