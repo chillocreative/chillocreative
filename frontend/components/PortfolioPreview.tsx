@@ -28,7 +28,7 @@ const PortfolioPreview = () => {
             try {
                 const data = await fetchGraphQL(`
                     query GetFeaturedProjects {
-                        projects(first: 3) {
+                        projects(first: 6) {
                             nodes {
                                 id
                                 title
