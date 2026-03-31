@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Mail, Phone, MapPin, Facebook, Instagram, Loader2, CheckCircle2, ChevronDown, Search } from 'lucide-react';
+import { Mail, Phone, MapPin, Facebook, Instagram, Loader2, CheckCircle2, ChevronDown, Search, MessageCircle } from 'lucide-react';
 import { countries } from '@/lib/countries';
 
 export default function ContactPage() {
@@ -98,6 +98,15 @@ export default function ContactPage() {
                                         Penang, Malaysia
                                     </p>
                                 </div>
+                                <a
+                                    href="https://wa.me/601110019843"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-green-500 hover:bg-green-600 text-white rounded-full font-semibold text-sm transition-all hover:scale-105 hover:shadow-[0_0_15px_rgba(34,197,94,0.4)] mt-2"
+                                >
+                                    <MessageCircle className="w-4 h-4" />
+                                    WhatsApp Us
+                                </a>
                             </div>
                         </div>
                         <div className="relative z-10 mt-12">
