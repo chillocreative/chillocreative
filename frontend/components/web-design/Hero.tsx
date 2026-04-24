@@ -19,7 +19,7 @@ const Hero = () => {
         <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-10 bg-repeat bg-[length:50px_50px]" />
       </div>
 
-      <div className="container mx-auto px-4 relative z-10">
+      <div className="container mx-auto px-6 sm:px-8 lg:px-12 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-12 items-center">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -27,11 +27,6 @@ const Hero = () => {
             transition={{ duration: 0.7 }}
             className="lg:col-span-3"
           >
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-xs tracking-widest uppercase text-purple-300 mb-6">
-              <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-              Reka Website Malaysia
-            </div>
-
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-[1.1] tracking-tight mb-6">
               Website Yang{' '}
               <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-pink-400 to-orange-400">
