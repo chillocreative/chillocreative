@@ -47,7 +47,7 @@ const Problem = () => {
             </span>
           </h2>
           <p className="text-gray-400 text-lg leading-relaxed">
-            Kebanyakan usahawan yang kami temui ada website &mdash; tapi website tu tak buat kerjanya.
+            Kebanyakan usahawan yang kami temui ada website, tapi website tu tak buat kerjanya.
             Ia hanya terpacak di situ, kelihatan &ldquo;okay sahaja&rdquo;, sementara pesaing diam-diam
             merampas pelanggan yang sepatutnya jadi milik anda.
           </p>

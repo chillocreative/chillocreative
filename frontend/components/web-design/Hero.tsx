@@ -37,7 +37,7 @@ const Hero = () => {
 
             <p className="text-gray-300 text-lg md:text-xl max-w-2xl leading-relaxed mb-10">
               Kami reka dan bina website berprestasi tinggi untuk bisnes Malaysia yang serius mahu
-              berkembang di alam digital. Tiada template pasaran, tiada karut-marut &mdash; hanya
+              berkembang di alam digital. Tiada template pasaran, tiada karut-marut. Hanya
               reka bentuk bersih, laju, dan memberi hasil yang nyata.
             </p>
 

@@ -26,7 +26,7 @@ const steps = [
     Icon: Rocket,
     number: '04',
     title: 'Lancar & Sokong',
-    body: 'Kita lancarkan bersama — kemudian kami kekal bersama untuk pastikan semuanya berjalan lancar.',
+    body: 'Kita lancarkan bersama, kemudian kami kekal bersama untuk pastikan semuanya berjalan lancar.',
   },
 ];
 

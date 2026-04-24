@@ -1,13 +1,37 @@
 'use client';
 
 import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Loader2, CheckCircle2, Send } from 'lucide-react';
+import { Send } from 'lucide-react';
+
+// TODO: Replace with live WhatsApp number if different
+const WA_NUMBER = '601110019843';
 
 const trackCta = (label: string, location: string) => {
   if (typeof window !== 'undefined' && typeof (window as any).gtag === 'function') {
     (window as any).gtag('event', 'cta_click', { cta_label: label, location });
   }
+};
+
+const buildWhatsAppUrl = (data: {
+  name: string;
+  email: string;
+  phone: string;
+  website: string;
+  message: string;
+}) => {
+  const lines = [
+    'Halo Chillo Creative! Saya nak tempah konsultasi reka website.',
+    '',
+    `Nama: ${data.name}`,
+    `Email: ${data.email}`,
+    `No. WhatsApp: ${data.phone}`,
+    data.website ? `Website Semasa: ${data.website}` : null,
+    '',
+    data.message ? `Keperluan:\n${data.message}` : null,
+  ].filter(Boolean);
+
+  const text = encodeURIComponent(lines.join('\n'));
+  return `https://wa.me/${WA_NUMBER}?text=${text}`;
 };
 
 const ContactForm = () => {
@@ -18,72 +42,13 @@ const ContactForm = () => {
     website: '',
     message: '',
   });
-  const [submitting, setSubmitting] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [error, setError] = useState('');
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitting(true);
-    setError('');
-
-    try {
-      const res = await fetch('/api/leads', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: data.name,
-          email: data.email,
-          phone: data.phone.replace(/\+/g, ''),
-          service: 'Web Design — Landing Page',
-          message: [
-            data.website ? `Website sedia ada: ${data.website}` : null,
-            data.message ? `Nota: ${data.message}` : null,
-          ]
-            .filter(Boolean)
-            .join('\n'),
-        }),
-      });
-
-      if (!res.ok) {
-        const body = await res.json().catch(() => ({}));
-        throw new Error(body.error || 'Gagal menghantar. Sila cuba lagi.');
-      }
-
-      trackCta('Form Submit', 'final-cta');
-      setSuccess(true);
-      setData({ name: '', email: '', phone: '', website: '', message: '' });
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Ralat tidak dijangka.';
-      setError(message);
-    } finally {
-      setSubmitting(false);
-    }
+    trackCta('Form Submit', 'final-cta');
+    const url = buildWhatsAppUrl(data);
+    window.open(url, '_blank', 'noopener,noreferrer');
   };
-
-  if (success) {
-    return (
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 p-10 text-center"
-      >
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-500/20 text-green-400 mb-4">
-          <CheckCircle2 className="w-8 h-8" />
-        </div>
-        <h3 className="text-2xl font-bold mb-2 text-white">Terima kasih!</h3>
-        <p className="text-gray-300 mb-6">
-          Kami terima tempahan anda. Team kami akan hubungi dalam 24 jam.
-        </p>
-        <button
-          onClick={() => setSuccess(false)}
-          className="px-6 py-2.5 rounded-full bg-white/10 hover:bg-white/20 text-white font-semibold transition-colors"
-        >
-          Hantar Satu Lagi
-        </button>
-      </motion.div>
-    );
-  }
 
   return (
     <form
@@ -163,30 +128,16 @@ const ContactForm = () => {
         />
       </div>
 
-      {error && (
-        <p className="text-red-400 text-sm font-semibold">{error}</p>
-      )}
-
       <button
         type="submit"
-        disabled={submitting}
-        className="w-full py-4 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold hover:shadow-[0_0_30px_rgba(168,85,247,0.5)] transition-all hover:scale-[1.01] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        className="w-full py-4 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold hover:shadow-[0_0_30px_rgba(168,85,247,0.5)] transition-all hover:scale-[1.01] flex items-center justify-center gap-2"
       >
-        {submitting ? (
-          <>
-            <Loader2 className="w-5 h-5 animate-spin" />
-            Menghantar...
-          </>
-        ) : (
-          <>
-            <Send className="w-5 h-5" />
-            Tempah Panggilan Percuma
-          </>
-        )}
+        <Send className="w-5 h-5" />
+        Hantar Sekarang
       </button>
 
       <p className="text-xs text-center text-gray-500">
-        Kami balas dalam 24 jam. Tiada spam, tiada jualan paksa.
+        Butang di atas akan buka WhatsApp dengan maklumat anda. Kami balas dalam 24 jam.
       </p>
     </form>
   );

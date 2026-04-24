@@ -17,7 +17,7 @@ const services = [
   {
     Icon: Code2,
     title: 'Development',
-    body: 'Dibina di atas WordPress, Laravel, atau kod yang bersesuaian — mana yang paling sesuai dengan keperluan anda.',
+    body: 'Dibina di atas WordPress, Laravel, atau kod yang bersesuaian, mana yang paling sesuai dengan keperluan anda.',
   },
   {
     Icon: Smartphone,
@@ -32,7 +32,7 @@ const services = [
   {
     Icon: LifeBuoy,
     title: 'Sokongan Berterusan',
-    body: 'Kami tidak lenyap selepas pelancaran. Penyelenggaraan, kemaskini, dan ketenangan fikiran — semua termasuk.',
+    body: 'Kami tidak lenyap selepas pelancaran. Penyelenggaraan, kemaskini, dan ketenangan fikiran, semua termasuk.',
   },
 ];
 
@@ -50,7 +50,7 @@ const Services = () => {
           className="max-w-3xl mx-auto text-center mb-16"
         >
           <h2 className="text-3xl md:text-5xl font-bold mb-6 leading-tight">
-            Semua Yang Anda Perlukan &mdash;{' '}
+            Semua Yang Anda Perlukan{' '}
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-400">
               Di Satu Tempat.
             </span>

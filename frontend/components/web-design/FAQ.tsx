@@ -11,7 +11,7 @@ const faqs = [
   },
   {
     q: 'Adakah saya memiliki website selepas ia siap?',
-    a: 'Ya, 100%. Pemilikan penuh — fail, domain, hosting, semuanya.',
+    a: 'Ya, 100%. Pemilikan penuh: fail, domain, hosting, semuanya.',
   },
   {
     q: 'Macam mana kalau saya belum ada copy atau gambar?',
@@ -19,7 +19,7 @@ const faqs = [
   },
   {
     q: 'Ada pilihan bayar ansuran?',
-    a: 'Ada — biasanya 50% deposit, 50% semasa pelancaran. Untuk projek lebih besar, kami tawarkan pelan 3-ansuran.',
+    a: 'Ada. Biasanya 50% deposit, 50% semasa pelancaran. Untuk projek lebih besar, kami tawarkan pelan 3-ansuran.',
   },
   {
     q: 'Boleh redesign website sedia ada saya?',
@@ -27,7 +27,7 @@ const faqs = [
   },
   {
     q: 'Apa yang berlaku selepas pelancaran?',
-    a: 'Kami tawarkan pelan penjagaan bulanan untuk kemaskini, backup, dan sokongan — atau anda boleh uruskan sendiri.',
+    a: 'Kami tawarkan pelan penjagaan bulanan untuk kemaskini, backup, dan sokongan. Atau anda boleh uruskan sendiri.',
   },
 ];
 

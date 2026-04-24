@@ -32,7 +32,7 @@ const projects: Project[] = [
   {
     client: 'Butik Aisyah',
     industry: 'Fesyen / E-commerce',
-    challenge: 'Jualan Instagram mencapai had — memerlukan kedai sendiri untuk berkembang.',
+    challenge: 'Jualan Instagram mencapai had, memerlukan kedai sendiri untuk berkembang.',
     result: 'RM 45K jualan dalam bulan pertama dengan integrasi FPX & Shopee Xpress.',
     image: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=800&q=70',
     alt: 'Website e-commerce butik',
@@ -46,7 +46,7 @@ const projects: Project[] = [
     alt: 'Website akademi pendidikan',
   },
   {
-    client: 'Setia Properties',
+    client: 'Aliff Properties',
     industry: 'Hartanah',
     challenge: 'Ejen hartanah terpaksa whatsapp gambar satu persatu kepada pembeli berpotensi.',
     result: '5x lead qualified per bulan dengan listing gallery & kalkulator pinjaman.',
@@ -81,7 +81,7 @@ const Portfolio = () => {
             </span>
           </h2>
           <p className="text-gray-400 text-lg">
-            Beberapa projek terkini kami &mdash; setiap satunya dibina dengan tujuan.
+            Beberapa projek terkini kami, setiap satunya dibina dengan tujuan.
           </p>
         </motion.div>
 
@@ -120,7 +120,7 @@ const Portfolio = () => {
                   </span>
                   {p.challenge}
                 </p>
-                <p className="text-sm leading-relaxed mb-5">
+                <p className="text-sm leading-relaxed">
                   <span className="text-gray-500 text-xs uppercase tracking-wider font-semibold block mb-1">
                     Hasil
                   </span>
@@ -128,12 +128,6 @@ const Portfolio = () => {
                     {p.result}
                   </span>
                 </p>
-                <a
-                  href="#tempah"
-                  className="inline-flex items-center gap-1.5 text-sm font-semibold text-white/90 hover:text-purple-300 transition-colors"
-                >
-                  Lihat Case Study <ArrowRight className="w-4 h-4" />
-                </a>
               </div>
             </motion.article>
           ))}

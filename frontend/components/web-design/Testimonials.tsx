@@ -13,7 +13,7 @@ type Testimonial = {
 const testimonials: Testimonial[] = [
   {
     quote:
-      'Chillo Creative bukan sekadar bina website — mereka bina mesin yang bawa masuk leads setiap hari. Pelaburan terbaik yang kami buat tahun ini.',
+      'Chillo Creative bukan sekadar bina website, mereka bina mesin yang bawa masuk leads setiap hari. Pelaburan terbaik yang kami buat tahun ini.',
     name: 'Aina Rashid',
     role: 'Pengasas, Butik Aisyah',
     avatar:
@@ -23,13 +23,13 @@ const testimonials: Testimonial[] = [
     quote:
       'Timeline tepat, komunikasi power, dan hasilnya jauh lebih baik daripada yang kami bayangkan. Website kami sekarang jadi jurujual penuh masa.',
     name: 'Hafiz Zulkifli',
-    role: 'CEO, Setia Properties',
+    role: 'CEO, Aliff Properties',
     avatar:
-      'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=160&h=160&q=70',
+      'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=160&h=160&q=70',
   },
   {
     quote:
-      'Akhirnya ada team yang faham bisnes orang Malaysia. FPX, WhatsApp, BM-English — semua smooth. Enquiry masuk siang malam tanpa kami sentuh apa-apa.',
+      'Akhirnya ada team yang faham bisnes orang Malaysia. FPX, WhatsApp, BM-English, semua smooth. Enquiry masuk siang malam tanpa kami sentuh apa-apa.',
     name: 'Dr. Siti Khadijah',
     role: 'Pengarah, Klinik Sihat Sejahtera',
     avatar:
@@ -37,7 +37,14 @@ const testimonials: Testimonial[] = [
   },
 ];
 
-const logos = ['Kopi Mak Long', 'Klinik Sihat', 'Butik Aisyah', 'Akademi Hafiz', 'Setia', 'Pak Abu'];
+const logos = [
+  'Kopi Mak Long',
+  'Klinik Sihat',
+  'Butik Aisyah',
+  'Akademi Hafiz',
+  'Aliff Properties',
+  'Pak Abu',
+];
 
 const Testimonials = () => {
   return (
@@ -104,20 +111,34 @@ const Testimonials = () => {
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.7 }}
-          className="max-w-5xl mx-auto"
+          className="max-w-6xl mx-auto"
         >
-          <div className="text-center text-xs tracking-widest uppercase text-gray-500 mb-6">
+          <div className="text-center text-xs tracking-widest uppercase text-gray-300 mb-6">
             Dipercayai oleh 50+ PKS di Malaysia
           </div>
-          <div className="grid grid-cols-3 sm:grid-cols-6 gap-6 items-center">
-            {logos.map((logo) => (
-              <div
-                key={logo}
-                className="flex items-center justify-center h-12 px-4 rounded-lg bg-white/[0.03] border border-white/5 text-gray-400 text-xs font-bold tracking-wide uppercase grayscale opacity-60 hover:opacity-100 hover:grayscale-0 transition-all"
-              >
-                {logo}
-              </div>
-            ))}
+          <div
+            className="relative overflow-hidden"
+            style={{
+              maskImage:
+                'linear-gradient(to right, transparent, black 10%, black 90%, transparent)',
+              WebkitMaskImage:
+                'linear-gradient(to right, transparent, black 10%, black 90%, transparent)',
+            }}
+          >
+            <motion.div
+              className="flex w-max gap-4"
+              animate={{ x: ['0%', '-50%'] }}
+              transition={{ duration: 28, ease: 'linear', repeat: Infinity }}
+            >
+              {[...logos, ...logos].map((logo, i) => (
+                <div
+                  key={`${logo}-${i}`}
+                  className="flex items-center justify-center h-12 px-6 rounded-lg bg-white/[0.08] border border-white/15 text-white text-xs font-bold tracking-wide uppercase whitespace-nowrap"
+                >
+                  {logo}
+                </div>
+              ))}
+            </motion.div>
           </div>
         </motion.div>
       </div>

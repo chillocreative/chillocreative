@@ -14,7 +14,7 @@ const benefits = [
   },
   {
     title: 'Dibina Untuk Pasaran Malaysia',
-    body: 'Kami faham perangai pembeli tempatan — FPX, enquiry WhatsApp, kandungan dwibahasa. Kami bina mengikut cara orang Malaysia betul-betul melayari web.',
+    body: 'Kami faham perangai pembeli tempatan: FPX, enquiry WhatsApp, kandungan dwibahasa. Kami bina mengikut cara orang Malaysia betul-betul melayari web.',
   },
 ];
 
@@ -92,7 +92,7 @@ const Solution = () => {
             </h2>
             <div className="space-y-5 mb-10 text-gray-300 leading-relaxed">
               <p>
-                Di Chillo Creative, kami bukan sekadar mereka bentuk website &mdash; kami cipta alat
+                Di Chillo Creative, kami bukan sekadar mereka bentuk website, kami cipta alat
                 digital yang berfungsi walaupun anda sedang tidur. Setiap halaman, setiap butang,
                 dan setiap perkataan disusun dengan tujuan yang satu: memandu pelawat anda untuk
                 mengambil tindakan.
