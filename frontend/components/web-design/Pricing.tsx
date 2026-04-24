@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { Check, Sparkles } from 'lucide-react';
+import { trackPixel } from '@/lib/pixel';
 
 type Tier = {
   name: string;
@@ -12,6 +13,7 @@ type Tier = {
   cta: string;
   href: string;
   popular?: boolean;
+  value: number;
 };
 
 const tiers: Tier[] = [
@@ -28,6 +30,7 @@ const tiers: Tier[] = [
     ],
     cta: 'Mula Sekarang',
     href: '#tempah',
+    value: 2500,
   },
   {
     name: 'Growth',
@@ -44,6 +47,7 @@ const tiers: Tier[] = [
     cta: 'Mula Sekarang',
     href: '#tempah',
     popular: true,
+    value: 5500,
   },
   {
     name: 'Custom',
@@ -58,6 +62,7 @@ const tiers: Tier[] = [
     ],
     cta: 'Minta Sebut Harga',
     href: '#tempah',
+    value: 0,
   },
 ];
 
@@ -153,7 +158,14 @@ const Pricing = () => {
 
               <a
                 href={t.href}
-                onClick={() => trackCta(`Pricing: ${t.name}`, 'pricing')}
+                onClick={() => {
+                  trackCta(`Pricing: ${t.name}`, 'pricing');
+                  trackPixel('InitiateCheckout', {
+                    value: t.value,
+                    currency: 'MYR',
+                    content_name: t.name,
+                  });
+                }}
                 className={`inline-flex items-center justify-center gap-2 w-full py-3.5 rounded-full font-bold transition-all hover:scale-[1.02] ${
                   t.popular
                     ? 'bg-white text-purple-700 hover:shadow-[0_0_30px_rgba(255,255,255,0.4)]'

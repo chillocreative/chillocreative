@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { ArrowRight, Star } from 'lucide-react';
 import HeroIllustration from './HeroIllustration';
+import { trackPixel } from '@/lib/pixel';
 
 const trackCta = (label: string, location: string) => {
   if (typeof window !== 'undefined' && typeof (window as any).gtag === 'function') {
@@ -44,7 +45,10 @@ const Hero = () => {
             <div className="flex flex-col sm:flex-row gap-4 sm:items-center mb-8">
               <a
                 href="#tempah"
-                onClick={() => trackCta('Dapatkan Audit Website Percuma', 'hero')}
+                onClick={() => {
+                  trackCta('Dapatkan Audit Website Percuma', 'hero');
+                  trackPixel('ViewContent', { content_name: 'Hero CTA' });
+                }}
                 className="group inline-flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full font-bold text-base md:text-lg hover:shadow-[0_0_30px_rgba(168,85,247,0.5)] transition-all hover:scale-[1.03]"
               >
                 Dapatkan Audit Website Percuma

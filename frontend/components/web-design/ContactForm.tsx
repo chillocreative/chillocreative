@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Send } from 'lucide-react';
+import { trackPixel } from '@/lib/pixel';
 
 // TODO: Replace with live WhatsApp number if different
 const WA_NUMBER = '601110019843';
@@ -46,6 +47,7 @@ const ContactForm = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     trackCta('Form Submit', 'final-cta');
+    trackPixel('Lead', { value: 2500, currency: 'MYR', content_name: 'Website Design Inquiry' });
     const url = buildWhatsAppUrl(data);
     window.open(url, '_blank', 'noopener,noreferrer');
   };
