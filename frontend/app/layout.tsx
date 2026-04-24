@@ -12,6 +12,9 @@ const outfit = Outfit({ subsets: ['latin'], variable: '--font-outfit' });
 export const metadata: Metadata = {
   title: 'Chillo Creative | Digital Agency',
   description: 'A premium digital agency specializing in Web Design, Web Apps, and SEO.',
+  other: {
+    'facebook-domain-verification': '8am1t916z1h96qh3meoo4bk181zbvf',
+  },
 };
 
 export default function RootLayout({
