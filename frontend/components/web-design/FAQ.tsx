@@ -7,7 +7,7 @@ import { Plus } from 'lucide-react';
 const faqs = [
   {
     q: 'Berapa lama masa diperlukan untuk bina website?',
-    a: 'Kebanyakan projek mengambil masa 4–6 minggu dari mula hingga pelancaran. Projek yang lebih besar mungkin mengambil 8–12 minggu.',
+    a: 'Kebanyakan projek mengambil masa 4 hingga 6 minggu dari mula hingga pelancaran. Projek yang lebih besar mungkin mengambil 8 hingga 12 minggu.',
   },
   {
     q: 'Adakah saya memiliki website selepas ia siap?',

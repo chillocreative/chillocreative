@@ -1,6 +1,6 @@
 # Reka Website Landing Page — Image Inventory
 
-This is the image placeholder inventory for `/web-design`. Everything in this page is one of:
+This is the image placeholder inventory for `/website`. Everything in this page is one of:
 
 - **Inline SVG** (no replacement needed)
 - **Lucide React icon** (no replacement needed)
@@ -84,4 +84,4 @@ Avatar images (60×60 rendered):
 - [ ] Edit `testimonials` array in `Testimonials.tsx` with real quotes + names
 - [ ] Confirm `WA_NUMBER` in `WhatsAppFloat.tsx` and `FinalCTA.tsx`
 - [ ] Add Google Analytics: replace the `(window as any).gtag(...)` calls are already in place; just install `gtag.js` in the root layout with your GA4 measurement ID
-- [ ] Optional: flip `metadata.robots.index` to `true` in `app/(site)/web-design/layout.tsx` if you want Google to index this funnel page
+- [ ] Optional: flip `metadata.robots.index` to `true` in `app/(site)/website/layout.tsx` if you want Google to index this funnel page
