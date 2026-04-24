@@ -18,10 +18,6 @@ const faqs = [
     a: 'Tak jadi masalah. Kami boleh tuliskan copy dan sediakan visual sebagai sebahagian daripada projek.',
   },
   {
-    q: 'Ada pilihan bayar ansuran?',
-    a: 'Ada. Biasanya 50% deposit, 50% semasa pelancaran. Untuk projek lebih besar, kami tawarkan pelan 3-ansuran.',
-  },
-  {
     q: 'Boleh redesign website sedia ada saya?',
     a: 'Boleh. Redesign adalah antara jenis projek yang paling kerap kami buat.',
   },
