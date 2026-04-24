@@ -24,10 +24,6 @@ const FinalCTA = () => {
             viewport={{ once: true, margin: '-80px' }}
             transition={{ duration: 0.6 }}
           >
-            <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/20 text-xs font-semibold tracking-widest uppercase text-purple-200 mb-6">
-              <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-              Slot terhad bulan ini
-            </span>
             <h2 className="text-3xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6">
               Bersedia Untuk Website Yang{' '}
               <span className="bg-clip-text text-transparent bg-gradient-to-r from-yellow-300 via-pink-300 to-purple-300">
