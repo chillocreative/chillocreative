@@ -224,11 +224,11 @@ export default function SurveyForm() {
             <form ref={formRef} onSubmit={handleSubmit} noValidate className="max-w-3xl mx-auto px-4 sm:px-6 py-6 sm:py-10 space-y-6">
                 {/* Intro */}
                 <div className="bg-gradient-to-br from-teal-600 to-emerald-600 text-white rounded-3xl p-6 sm:p-8 shadow-lg">
-                    <h2 className="text-xl sm:text-2xl font-bold mb-2">Selamat datang!</h2>
+                    <h2 className="text-xl sm:text-2xl font-bold mb-2">Selamat Datang!</h2>
                     <p className="text-teal-50 text-sm sm:text-base leading-relaxed">
                         Borang ini bertujuan memahami latar belakang dan keperluan anda sebagai peserta program
-                        training <span className="font-semibold">Vibecoding</span>. Maklum balas anda akan membantu kami
-                        menyediakan sesi yang lebih bermanfaat. Anggaran masa: <span className="font-semibold">5–8 minit</span>.
+                        training AI. Maklum balas anda akan membantu kami menyediakan sesi yang lebih bermanfaat
+                        dan berkesan. Anggaran masa: <span className="font-semibold">5–8 minit</span>.
                     </p>
                     <p className="text-teal-100/80 text-xs mt-3">
                         Medan bertanda <span className="text-amber-200 font-bold">*</span> adalah wajib diisi.
