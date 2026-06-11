@@ -345,14 +345,6 @@ export default function SurveyForm() {
                             onToggle={(v) => toggleCheckbox('toolTeknikal', v)}
                         />
                     </Field>
-                    <Field label="Tahap keselesaan teknikal anda" hint="1 = Tidak selesa langsung, 5 = Sangat selesa">
-                        <ScalePicker
-                            value={form.tahapKeselesaan}
-                            onChange={(v) => set('tahapKeselesaan', v)}
-                            lowLabel="Tidak selesa"
-                            highLabel="Sangat selesa"
-                        />
-                    </Field>
                     <Field label="Pernah bina app / website / automation sendiri? Ceritakan">
                         <textarea
                             value={form.pernahBina}
