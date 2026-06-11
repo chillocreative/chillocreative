@@ -500,7 +500,7 @@ export default function SurveyForm() {
                         )}
                     </button>
                     <p className="text-center text-xs text-slate-400 mt-4">
-                        Program Training Vibecoding · Majlis Bandaraya Seberang Perai (MBSP)
+                        Program AI Training · Majlis Bandaraya Seberang Perai (MBSP)
                     </p>
                 </div>
             </form>
