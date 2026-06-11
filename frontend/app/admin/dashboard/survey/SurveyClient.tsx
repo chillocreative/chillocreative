@@ -290,6 +290,13 @@ export default function SurveyClient({ initialResponses }: { initialResponses: S
                         </div>
 
                         <div className="p-6 space-y-6 overflow-y-auto custom-scrollbar">
+                            <Group title="A · Maklumat Diri">
+                                <Item label="Nama penuh" value={current.namaPenuh} />
+                                <Item label="Jawatan" value={current.jawatan} />
+                                <Item label="Emel rasmi" value={current.emel} />
+                                <Item label="No. telefon / WhatsApp" value={current.telefon} />
+                            </Group>
+
                             <Group title="B · Latar Belakang Kerja">
                                 <Item label="Skop kerja harian" value={current.skopKerja} />
                                 <Item label="Sistem / perisian utama" value={current.sistemUtama} />
@@ -300,7 +307,6 @@ export default function SurveyClient({ initialResponses }: { initialResponses: S
                             <Group title="C · Tahap Teknikal">
                                 <Item label="Bahasa pengaturcaraan" value={current.bahasaPengaturcaraan} extra={current.bahasaPengaturcaraanLain} />
                                 <Item label="Tool teknikal" value={current.toolTeknikal} />
-                                <Item label="Tahap keselesaan teknikal" value={current.tahapKeselesaan ? `${current.tahapKeselesaan} / 5` : null} />
                                 <Item label="Pernah bina app/website/automation" value={current.pernahBina} />
                             </Group>
 
