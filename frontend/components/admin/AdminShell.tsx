@@ -13,7 +13,8 @@ import {
     FileCheck,
     Menu,
     X,
-    ChevronRight
+    ChevronRight,
+    ClipboardList
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -23,6 +24,7 @@ const navItems = [
     { name: 'Quotations', href: '/admin/dashboard/quotations', icon: FileCheck },
     { name: 'Invoices', href: '/admin/dashboard/invoices', icon: FileText },
     { name: 'Projects', href: '/admin/dashboard/projects', icon: FolderKanban },
+    { name: 'Tinjauan MBSP', href: '/admin/dashboard/survey', icon: ClipboardList },
     { name: 'Settings', href: '/admin/dashboard/settings', icon: Settings },
 ];
 

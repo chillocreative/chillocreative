@@ -81,6 +81,57 @@ model Quotation {
   @@map("quotation")
 }
 
+model SurveyResponse {
+  id Int @id @default(autoincrement())
+
+  // BAHAGIAN A — Maklumat Diri
+  namaPenuh String
+  jawatan   String?
+  emel      String
+  telefon   String?
+
+  // BAHAGIAN B — Latar Belakang Kerja
+  skopKerja           String  @db.Text
+  sistemUtama         String?
+  kerjaMelibatkan     Json?
+  kerjaMelibatkanLain String?
+  menulisKod          String?
+
+  // BAHAGIAN C — Tahap Teknikal
+  bahasaPengaturcaraan     Json?
+  bahasaPengaturcaraanLain String?
+  toolTeknikal             Json?
+  tahapKeselesaan          Int?
+  pernahBina               String? @db.Text
+
+  // BAHAGIAN D — Penggunaan AI Semasa
+  aiTools           Json?
+  aiToolsLain       String?
+  kekerapanAi       String?
+  gunaAiUntuk       Json?
+  gunaAiUntukLain   String?
+  caraGunaAi        Json?
+  caraGunaAiLain    String?
+  caraPrompt        String?
+  cabaranAi         String? @db.Text
+  aiCodingAssistant String?
+
+  // BAHAGIAN E — Matlamat & Harapan
+  harapBelajar  String  @db.Text
+  tugasAutomasi String? @db.Text
+  projekCuba    String?
+
+  // BAHAGIAN F — Logistik & Kesediaan
+  peranti      String?
+  keselesaanBI Int?
+
+  status    String   @default("Baru")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("survey_response")
+}
+
 model User {
   id        Int      @id @default(autoincrement())
   username  String   @unique
