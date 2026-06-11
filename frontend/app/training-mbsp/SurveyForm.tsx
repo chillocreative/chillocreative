@@ -209,7 +209,7 @@ export default function SurveyForm() {
                             Majlis Bandaraya Seberang Perai
                         </p>
                         <h1 className="text-sm sm:text-base font-bold text-slate-800 leading-tight truncate">
-                            Borang Tinjauan Peserta — Training Vibecoding
+                            Borang Tinjauan Peserta — Training MBSP
                         </h1>
                     </div>
                 </div>
