@@ -16,6 +16,7 @@ import {
     ShieldCheck,
     Calendar,
     BookOpen,
+    KeyRound,
 } from 'lucide-react';
 
 // ---------------------------------------------------------------------------
@@ -313,32 +314,30 @@ export default function LandingPage() {
             </section>
 
             {/* ----------------------------------------------------------------- */}
-            {/* MUAT TURUN BUKU KERJA */}
+            {/* MUAT TURUN */}
             {/* ----------------------------------------------------------------- */}
             <section className="mx-auto max-w-5xl px-6 py-20 sm:py-28">
                 <Reveal>
-                    <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 to-teal-900 px-6 py-14 text-center shadow-xl sm:px-12">
-                        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-white/10 text-teal-300 ring-1 ring-white/15">
-                            <BookOpen size={26} />
-                        </div>
-                        <h2 className="mt-6 text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
-                            Buku Kerja Peserta
-                        </h2>
-                        <p className="mx-auto mt-4 max-w-md text-slate-300">
-                            Muat turun buku kerja rasmi untuk diikuti sepanjang sesi hands-on — latihan, template
-                            prompt &amp; nota projek.
-                        </p>
-                        <a
-                            href="/Buku_Kerja_Peserta_MBSP.pdf"
-                            download
-                            className="group mt-8 inline-flex items-center gap-3 rounded-full bg-white px-7 py-4 text-base font-bold text-slate-900 shadow-lg transition-all hover:scale-[1.03] hover:bg-teal-50 active:scale-[0.99]"
-                        >
-                            <Download size={20} className="transition-transform group-hover:translate-y-0.5" />
-                            Download Buku Kerja Peserta
-                        </a>
-                        <p className="mt-4 text-xs text-slate-400">PDF · ~0.4 MB</p>
-                    </div>
+                    <SectionHeading eyebrow="Muat Turun" title="Bahan Peserta" />
                 </Reveal>
+                <div className="mt-12 grid gap-5 md:grid-cols-2">
+                    <DownloadCard
+                        icon={BookOpen}
+                        title="Buku Kerja Peserta"
+                        desc="Buku kerja rasmi untuk diikuti sepanjang sesi hands-on — latihan, template prompt & nota projek."
+                        href="/Buku_Kerja_Peserta_MBSP.pdf"
+                        button="Download Buku Kerja Peserta"
+                        meta="PDF · ~0.4 MB"
+                    />
+                    <DownloadCard
+                        icon={KeyRound}
+                        title="Manual Setup API Key Claude"
+                        desc="Panduan langkah demi langkah untuk kongsi & setup API Key Claude Code bagi sesi latihan."
+                        href="/Manual_Setup_Claude_Code_API_Key.pdf"
+                        button="Download Manual API Key"
+                        meta="PDF · ~0.15 MB"
+                    />
+                </div>
             </section>
 
             {/* ----------------------------------------------------------------- */}
@@ -366,6 +365,43 @@ function MetaChip({ label, value }: { label: string; value: string }) {
             <span className="text-[11px] font-semibold uppercase tracking-wide text-teal-600">{label}</span>
             <span className="font-medium text-slate-700">{value}</span>
         </span>
+    );
+}
+
+function DownloadCard({
+    icon: Icon,
+    title,
+    desc,
+    href,
+    button,
+    meta,
+}: {
+    icon: React.ComponentType<{ size?: number; className?: string }>;
+    title: string;
+    desc: string;
+    href: string;
+    button: string;
+    meta: string;
+}) {
+    return (
+        <Reveal className="h-full">
+            <div className="flex h-full flex-col overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 to-teal-900 px-6 py-12 text-center shadow-xl sm:px-10">
+                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-white/10 text-teal-300 ring-1 ring-white/15">
+                    <Icon size={26} />
+                </div>
+                <h3 className="mt-6 text-2xl font-extrabold tracking-tight text-white sm:text-3xl">{title}</h3>
+                <p className="mx-auto mt-4 max-w-sm flex-grow text-sm text-slate-300">{desc}</p>
+                <a
+                    href={href}
+                    download
+                    className="group mt-8 inline-flex items-center justify-center gap-3 rounded-full bg-white px-6 py-4 text-base font-bold text-slate-900 shadow-lg transition-all hover:scale-[1.03] hover:bg-teal-50 active:scale-[0.99]"
+                >
+                    <Download size={20} className="transition-transform group-hover:translate-y-0.5" />
+                    {button}
+                </a>
+                <p className="mt-4 text-xs text-slate-400">{meta}</p>
+            </div>
+        </Reveal>
     );
 }
 
