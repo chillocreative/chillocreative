@@ -17,6 +17,7 @@ import {
     Calendar,
     BookOpen,
     KeyRound,
+    Presentation,
 } from 'lucide-react';
 
 // ---------------------------------------------------------------------------
@@ -320,7 +321,15 @@ export default function LandingPage() {
                 <Reveal>
                     <SectionHeading eyebrow="Muat Turun" title="Bahan Peserta" />
                 </Reveal>
-                <div className="mt-12 grid gap-5 md:grid-cols-2">
+                <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+                    <DownloadCard
+                        icon={Presentation}
+                        title="Slide Deck"
+                        desc="Slaid penuh program Vibe Coding — semua modul, contoh prompt & rujukan untuk diimbas semula."
+                        href="/Slide_Deck_Vibe_Coding_MBSP.pdf"
+                        button="Download Slide Deck"
+                        meta="PDF · ~0.7 MB"
+                    />
                     <DownloadCard
                         icon={BookOpen}
                         title="Buku Kerja Peserta"
