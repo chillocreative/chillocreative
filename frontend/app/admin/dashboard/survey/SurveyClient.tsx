@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
     Search, Eye, Trash2, X, Mail, Phone, Calendar, Briefcase,
-    Download, ClipboardList, CheckCircle2,
+    Download, ClipboardList, CheckCircle2, FileText,
 } from 'lucide-react';
 
 type Survey = {
@@ -49,6 +49,7 @@ export default function SurveyClient({ initialResponses }: { initialResponses: S
     const [search, setSearch] = useState('');
     const [statusFilter, setStatusFilter] = useState('Semua');
     const [current, setCurrent] = useState<Survey | null>(null);
+    const [pdfLoading, setPdfLoading] = useState(false);
     const router = useRouter();
 
     const filtered = useMemo(
@@ -146,6 +147,167 @@ export default function SurveyClient({ initialResponses }: { initialResponses: S
         URL.revokeObjectURL(url);
     };
 
+    // Hasilkan satu fail PDF yang mengumpulkan SEMUA respons (mengikut tapisan semasa),
+    // setiap peserta pada muka surat tersendiri dengan susun atur penuh Bahagian A–F.
+    const exportPdf = async () => {
+        if (filtered.length === 0) return;
+        setPdfLoading(true);
+        try {
+            const { jsPDF } = await import('jspdf');
+            const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+
+            const pageW = doc.internal.pageSize.getWidth();
+            const pageH = doc.internal.pageSize.getHeight();
+            const margin = 40;
+            const contentW = pageW - margin * 2;
+            const labelW = 165;
+            const valueX = margin + labelW + 12;
+            const valueW = contentW - labelW - 12;
+            const lineH = 13;
+
+            const teal: [number, number, number] = [13, 148, 136];
+            const grayTxt: [number, number, number] = [110, 116, 128];
+            const darkTxt: [number, number, number] = [40, 44, 52];
+            let y = margin;
+
+            const fmt = (v: string | string[] | number | null, extra?: string | null) => {
+                let base: string;
+                if (v === null || v === undefined || v === '') base = '—';
+                else if (Array.isArray(v)) base = v.length ? v.join(', ') : '—';
+                else base = String(v);
+                if (extra) base = base === '—' ? String(extra) : `${base}, ${extra}`;
+                return base;
+            };
+
+            const ensure = (needed: number) => {
+                if (y + needed > pageH - margin) {
+                    doc.addPage();
+                    y = margin;
+                }
+            };
+
+            const group = (title: string) => {
+                ensure(34);
+                y += 8;
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(10);
+                doc.setTextColor(...teal);
+                doc.text(title.toUpperCase(), margin, y + 8);
+                doc.setDrawColor(...teal);
+                doc.setLineWidth(0.6);
+                doc.line(margin, y + 13, pageW - margin, y + 13);
+                y += 24;
+            };
+
+            const item = (label: string, value: string | string[] | number | null, extra?: string | null) => {
+                doc.setFontSize(9);
+                const labelLines = doc.splitTextToSize(label, labelW);
+                const valueLines = doc.splitTextToSize(fmt(value, extra), valueW);
+                const rowH = Math.max(labelLines.length, valueLines.length) * lineH + 6;
+                ensure(rowH);
+                doc.setFont('helvetica', 'normal');
+                doc.setTextColor(...grayTxt);
+                doc.text(labelLines, margin, y + lineH - 3);
+                doc.setTextColor(...darkTxt);
+                doc.text(valueLines, valueX, y + lineH - 3);
+                y += rowH;
+            };
+
+            filtered.forEach((r, idx) => {
+                if (idx > 0) doc.addPage();
+                y = margin;
+
+                // Tajuk dokumen pada setiap muka surat
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(15);
+                doc.setTextColor(...darkTxt);
+                doc.text('Tinjauan Training MBSP', margin, y + 6);
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(8);
+                doc.setTextColor(...grayTxt);
+                doc.text(`Peserta ${idx + 1} / ${filtered.length}`, pageW - margin, y + 6, { align: 'right' });
+                y += 18;
+                doc.setDrawColor(220, 220, 220);
+                doc.setLineWidth(0.8);
+                doc.line(margin, y, pageW - margin, y);
+                y += 14;
+
+                // Blok pengenalan peserta
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(13);
+                doc.setTextColor(...teal);
+                doc.text(doc.splitTextToSize((r.namaPenuh || '—').toUpperCase(), contentW), margin, y + 8);
+                y += 20;
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(8.5);
+                doc.setTextColor(...grayTxt);
+                const meta = [
+                    r.jawatan ? `Jawatan: ${r.jawatan}` : null,
+                    `Emel: ${r.emel}`,
+                    r.telefon ? `Tel: ${r.telefon}` : null,
+                    `Status: ${r.status}`,
+                    `Tarikh: ${new Date(r.createdAt).toLocaleString('en-GB')}`,
+                ].filter(Boolean).join('   •   ');
+                const metaLines = doc.splitTextToSize(meta, contentW);
+                doc.text(metaLines, margin, y + 6);
+                y += metaLines.length * 11 + 6;
+
+                group('A · Maklumat Diri');
+                item('Nama penuh', r.namaPenuh);
+                item('Jawatan', r.jawatan);
+                item('Emel rasmi', r.emel);
+                item('No. telefon / WhatsApp', r.telefon);
+
+                group('B · Latar Belakang Kerja');
+                item('Skop kerja harian', r.skopKerja);
+                item('Sistem / perisian utama', r.sistemUtama);
+                item('Kerja melibatkan', r.kerjaMelibatkan, r.kerjaMelibatkanLain);
+                item('Menulis kod / skrip', r.menulisKod);
+
+                group('C · Tahap Teknikal');
+                item('Bahasa pengaturcaraan', r.bahasaPengaturcaraan, r.bahasaPengaturcaraanLain);
+                item('Tool teknikal', r.toolTeknikal);
+                item('Tahap keselesaan teknikal', r.tahapKeselesaan ? `${r.tahapKeselesaan} / 5` : null);
+                item('Pernah bina app/website/automation', r.pernahBina);
+
+                group('D · Penggunaan AI Semasa');
+                item('AI tools diguna', r.aiTools, r.aiToolsLain);
+                item('Kekerapan guna AI', r.kekerapanAi);
+                item('Guna AI untuk', r.gunaAiUntuk, r.gunaAiUntukLain);
+                item('Cara guna AI', r.caraGunaAi, r.caraGunaAiLain);
+                item('Cara menulis prompt', r.caraPrompt);
+                item('Cabaran terbesar guna AI', r.cabaranAi);
+                item('AI coding assistant', r.aiCodingAssistant);
+
+                group('E · Matlamat & Harapan');
+                item('Paling harap belajar', r.harapBelajar);
+                item('Tugas berulang boleh diautomasi', r.tugasAutomasi);
+                item('Projek nak cuba bina', r.projekCuba);
+
+                group('F · Logistik & Kesediaan');
+                item('Peranti yang akan diguna', r.peranti);
+                item('Keselesaan Bahasa Inggeris teknikal', r.keselesaanBI ? `${r.keselesaanBI} / 5` : null);
+            });
+
+            // Nombor muka surat
+            const total = doc.getNumberOfPages();
+            for (let p = 1; p <= total; p++) {
+                doc.setPage(p);
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(7.5);
+                doc.setTextColor(...grayTxt);
+                doc.text(`Muka surat ${p} / ${total}`, pageW / 2, pageH - 18, { align: 'center' });
+            }
+
+            doc.save(`tinjauan-training-mbsp-${new Date().toISOString().slice(0, 10)}.pdf`);
+        } catch (e) {
+            console.error('Gagal menjana PDF:', e);
+            alert('Gagal menjana PDF. Sila cuba lagi.');
+        } finally {
+            setPdfLoading(false);
+        }
+    };
+
     const statusBadge = (status: string) =>
         status === 'Baru'
             ? 'bg-blue-500/10 text-blue-400 border-blue-500/20'
@@ -162,13 +324,23 @@ export default function SurveyClient({ initialResponses }: { initialResponses: S
                     </h1>
                     <p className="text-gray-400 mt-2">Maklum balas peserta program training — {responses.length} jumlah respons</p>
                 </div>
-                <button
-                    onClick={exportCsv}
-                    disabled={filtered.length === 0}
-                    className="flex items-center gap-2 px-5 py-2.5 bg-teal-600 hover:bg-teal-700 disabled:opacity-50 text-white rounded-lg font-bold transition-all"
-                >
-                    <Download size={18} /> Eksport CSV
-                </button>
+                <div className="flex items-center gap-3">
+                    <button
+                        onClick={exportPdf}
+                        disabled={filtered.length === 0 || pdfLoading}
+                        className="flex items-center gap-2 px-5 py-2.5 bg-rose-600 hover:bg-rose-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg font-bold transition-all"
+                        title="Muat turun semua respons dalam satu fail PDF"
+                    >
+                        <FileText size={18} /> {pdfLoading ? 'Menjana…' : 'Muat Turun PDF'}
+                    </button>
+                    <button
+                        onClick={exportCsv}
+                        disabled={filtered.length === 0}
+                        className="flex items-center gap-2 px-5 py-2.5 bg-teal-600 hover:bg-teal-700 disabled:opacity-50 text-white rounded-lg font-bold transition-all"
+                    >
+                        <Download size={18} /> Eksport CSV
+                    </button>
+                </div>
             </div>
 
             {/* Filter bar */}
