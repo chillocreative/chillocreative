@@ -128,17 +128,27 @@ export default function LandingPage() {
 
     return (
         <main className="min-h-screen bg-white text-slate-800 selection:bg-teal-200/60">
-            {/* URL bar — peserta lihat alamat ini dahulu */}
-            <div className="w-full bg-slate-900 text-center px-4 py-2.5">
-                <p className="font-mono text-[13px] sm:text-sm text-teal-300 tracking-tight break-all">
-                    https://chillocreative.com/mbsp
-                </p>
-            </div>
+            {/* URL section — peserta lihat alamat ini dahulu (besar, separuh page) */}
+            <section className="flex min-h-[55vh] w-full flex-col items-center justify-center bg-slate-900 px-6 py-16 text-center">
+                <motion.div
+                    initial={{ opacity: 0, y: 16 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, ease: 'easeOut' }}
+                    className="flex flex-col items-center"
+                >
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-teal-400/70 sm:text-xs">
+                        Layari Pautan Ini
+                    </p>
+                    <p className="mt-6 break-all font-mono text-2xl font-bold leading-tight tracking-tight text-teal-300 sm:text-4xl md:text-5xl lg:text-6xl">
+                        https://chillocreative.com/mbsp
+                    </p>
+                </motion.div>
+            </section>
 
             {/* ----------------------------------------------------------------- */}
             {/* HERO */}
             {/* ----------------------------------------------------------------- */}
-            <section className="relative flex min-h-[calc(100vh-44px)] flex-col items-center justify-center px-6 py-20 text-center">
+            <section className="relative flex min-h-screen flex-col items-center justify-center px-6 py-20 text-center">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -186,7 +196,7 @@ export default function LandingPage() {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.9, duration: 0.6 }}
-                    className="group absolute bottom-8 flex flex-col items-center gap-2 text-slate-400 transition-colors hover:text-teal-600"
+                    className="group mt-16 flex flex-col items-center gap-2 pt-4 text-slate-400 transition-colors hover:text-teal-600 sm:mt-20"
                 >
                     <span className="text-[11px] font-medium uppercase tracking-widest">Lihat butiran</span>
                     <motion.span
