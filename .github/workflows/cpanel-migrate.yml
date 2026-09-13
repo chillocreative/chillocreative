@@ -45,9 +45,10 @@ jobs:
           } >> "$GITHUB_ENV"
 
       - name: known_hosts
+        timeout-minutes: 2
         run: |
-          ssh-keyscan -p 22 "$VPS_HOST" >> ~/.ssh/known_hosts 2>/dev/null
-          ssh-keyscan -p "$CP_PORT" "$CP_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+          ssh-keyscan -p 22 "$VPS_HOST" >> ~/.ssh/known_hosts 2>/dev/null || true
+          ssh-keyscan -p "$CP_PORT" "$CP_HOST" >> ~/.ssh/known_hosts 2>/dev/null || true
 
       # ---------------------------------------------------------------
       # 1. Package everything we need from the live VPS. All credential
