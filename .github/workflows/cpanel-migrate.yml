@@ -87,20 +87,18 @@ jobs:
             tar czf "$WORK/uploads.tar.gz" -C /var/www/html/wordpress/wp-content uploads
             echo "uploads packaged: $(du -sh "$WORK/uploads.tar.gz" | cut -f1)"
 
+            # A static .env file can drift from what's actually running -
+            # merge both sources and prefer pm2's live runtime env (appended
+            # last, picked up via `tail -1` below) as the source of truth.
             FRONT=~/chillocreative/frontend
-            ENVFILE=""
+            : > "$WORK/frontend.env"
             for f in "$FRONT"/.env.production "$FRONT"/.env; do
-              [ -f "$f" ] && ENVFILE="$f" && break
+              [ -f "$f" ] && cat "$f" >> "$WORK/frontend.env"
             done
-            if [ -n "$ENVFILE" ]; then
-              cp "$ENVFILE" "$WORK/frontend.env"
-              echo "frontend env source: file ($(basename "$ENVFILE"))"
-            else
-              pm2 env 0 2>/dev/null | grep -E '^[A-Z_]+: ' | sed -E 's/^([A-Z_]+): /\1=/' > "$WORK/frontend.env" || true
-              echo "frontend env source: pm2 env fallback ($(wc -l < "$WORK/frontend.env") vars)"
-            fi
+            pm2 env 0 2>/dev/null | grep -E '^[A-Z_]+: ' | sed -E 's/^([A-Z_]+): /\1=/' >> "$WORK/frontend.env" || true
+            echo "frontend env sources merged: $(wc -l < "$WORK/frontend.env") lines total"
 
-            CRM_URL=$(grep -oE 'DATABASE_URL=.*' "$WORK/frontend.env" | head -1)
+            CRM_URL=$(grep -oE 'DATABASE_URL=.*' "$WORK/frontend.env" | tail -1)
             # Passwords can contain '@' (seen elsewhere in this project's
             # generated credentials), so match against the LAST '@' as the
             # user:pass/host separator, not the first - a naive [^@]+
@@ -109,6 +107,10 @@ jobs:
             CRM_USER=$(echo "$CRM_URL" | sed -E 's#.*//([^:]+):.*#\1#')
             CRM_PASS=$(echo "$CRM_URL" | sed -E 's#.*//[^:]+:(.*)@[^@]+$#\1#')
             echo "CRM DB name resolved: $([ -n "$CRM_DB" ] && echo yes || echo NO)"
+            echo "CRM_URL '@' count (safe, structural only): $(echo "$CRM_URL" | grep -o '@' | wc -l)"
+            echo "CRM_USER length: ${#CRM_USER}"
+            echo "CRM_PASS length: ${#CRM_PASS}"
+            echo "CRM_DB value length: ${#CRM_DB}"
             if [ -n "$CRM_DB" ] && [ -n "$CRM_USER" ] && [ -n "$CRM_PASS" ]; then
               MYSQL_PWD="$CRM_PASS" timeout 60 mysqldump --no-tablespaces --single-transaction --skip-lock-tables -u"$CRM_USER" "$CRM_DB" > "$WORK/crm.sql" 2>/tmp/crm_dump_err.log || echo "CRM dump failed: $(cat /tmp/crm_dump_err.log)"
               echo "CRM DB dumped: $(wc -l < "$WORK/crm.sql" 2>/dev/null || echo 0) lines"
