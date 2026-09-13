@@ -110,6 +110,16 @@ jobs:
             php -v 2>&1 | head -1
             echo "== WP-CLI available? =="
             which wp 2>&1 || echo "no wp-cli"
+            echo "== public_html/.git remote =="
+            git -C ~/public_html remote -v 2>&1
+            echo "== public_html/.git last 5 commits =="
+            git -C ~/public_html log --oneline -5 2>&1
+            echo "== public_html/app tree (depth 3) =="
+            find ~/public_html/app -maxdepth 3 2>&1
+            echo "== full MySQL database list with sizes =="
+            uapi Mysql list_databases 2>&1
+            echo "== cloudlinux Node.js apps already configured =="
+            /usr/sbin/cloudlinux-selector list --json --interpreter nodejs 2>&1
           '
 
       - name: Recon - Cloudflare DNS (read-only, public info)
