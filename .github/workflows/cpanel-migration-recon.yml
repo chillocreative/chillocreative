@@ -82,6 +82,14 @@ jobs:
             df -h / 2>&1
             echo "== nginx sites for chillocreative =="
             grep -l chillocreative /etc/nginx/conf.d/*.conf /etc/nginx/sites-enabled/* 2>/dev/null || echo "not found by grep"
+            echo "== frontend env files (names only) =="
+            ls -la ~/chillocreative/frontend/.env* 2>&1
+            echo "== ecosystem/pm2 config files =="
+            find ~/chillocreative -maxdepth 2 -iname "ecosystem*" 2>&1
+            echo "== pm2 describe chillo-frontend: script path / exec cwd only (no env values) =="
+            pm2 describe chillo-frontend 2>&1 | grep -iE "script path|exec cwd|node args|namespace"
+            echo "== pm2 env var NAMES only (grep -o never captures the value that follows) =="
+            pm2 describe chillo-frontend 2>&1 | grep -oE "\b[A-Z_]{4,}\b" | sort -u
           '
 
       - name: Recon - cPanel (structure only, no secrets)
