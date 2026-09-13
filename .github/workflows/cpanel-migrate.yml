@@ -81,7 +81,7 @@ jobs:
               echo "FATAL: could not extract WordPress DB credentials from wp-config.php" >&2
               exit 1
             fi
-            MYSQL_PWD="$WP_PASS" timeout 60 mysqldump --connect-timeout=10 -u"$WP_USER" "$WP_DB" > "$WORK/wp.sql"
+            MYSQL_PWD="$WP_PASS" timeout 60 mysqldump -u"$WP_USER" "$WP_DB" > "$WORK/wp.sql"
             echo "WordPress DB dumped: $(wc -l < "$WORK/wp.sql") lines"
 
             tar czf "$WORK/uploads.tar.gz" -C /var/www/html/wordpress/wp-content uploads
@@ -106,7 +106,7 @@ jobs:
             CRM_PASS=$(echo "$CRM_URL" | sed -E 's#.*//[^:]+:([^@]+)@.*#\1#')
             echo "CRM DB name resolved: $([ -n "$CRM_DB" ] && echo yes || echo NO)"
             if [ -n "$CRM_DB" ] && [ -n "$CRM_USER" ] && [ -n "$CRM_PASS" ]; then
-              MYSQL_PWD="$CRM_PASS" timeout 60 mysqldump --connect-timeout=10 -u"$CRM_USER" "$CRM_DB" > "$WORK/crm.sql" 2>/tmp/crm_dump_err.log || echo "CRM dump failed: $(cat /tmp/crm_dump_err.log)"
+              MYSQL_PWD="$CRM_PASS" timeout 60 mysqldump -u"$CRM_USER" "$CRM_DB" > "$WORK/crm.sql" 2>/tmp/crm_dump_err.log || echo "CRM dump failed: $(cat /tmp/crm_dump_err.log)"
               echo "CRM DB dumped: $(wc -l < "$WORK/crm.sql" 2>/dev/null || echo 0) lines"
             else
               echo "CRM DB credentials not resolved from frontend env - skipping CRM dump"
@@ -160,13 +160,13 @@ jobs:
             echo "CRM db user password set: yes"
 
             if [ -s ~/migrate_incoming/wp.sql ]; then
-              MYSQL_PWD="$WP_DBPASS" timeout 120 mysql --connect-timeout=10 -u"$WP_DBUSER" "$WP_DB" < ~/migrate_incoming/wp.sql
+              MYSQL_PWD="$WP_DBPASS" timeout 120 mysql -u"$WP_DBUSER" "$WP_DB" < ~/migrate_incoming/wp.sql
               echo "WordPress DB imported"
             else
               echo "no wp.sql to import"
             fi
             if [ -s ~/migrate_incoming/crm.sql ]; then
-              MYSQL_PWD="$CRM_DBPASS" timeout 120 mysql --connect-timeout=10 -u"$CRM_DBUSER" "$CRM_DB" < ~/migrate_incoming/crm.sql
+              MYSQL_PWD="$CRM_DBPASS" timeout 120 mysql -u"$CRM_DBUSER" "$CRM_DB" < ~/migrate_incoming/crm.sql
               echo "CRM DB imported"
             else
               echo "no crm.sql to import"
