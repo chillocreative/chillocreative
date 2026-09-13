@@ -55,14 +55,15 @@ jobs:
       #    echoed - only non-secret progress lines are printed.
       # ---------------------------------------------------------------
       - name: Package data on VPS
+        timeout-minutes: 5
         run: |
-          ssh -i ~/.ssh/vps_key -o StrictHostKeyChecking=accept-new "$VPS_USER@$VPS_HOST" 'bash -s' <<'REMOTE'
+          ssh -i ~/.ssh/vps_key -o StrictHostKeyChecking=accept-new -o ConnectTimeout=15 -o BatchMode=yes "$VPS_USER@$VPS_HOST" 'bash -s' <<'REMOTE'
             set -e
             WORK=/tmp/chillo_migrate
             rm -rf "$WORK"; mkdir -p "$WORK"
 
             WP_CFG=/var/www/html/wordpress/wp-config.php
-            WP_DB=$(php -r "define('ABSPATH','/tmp/');include('$WP_CFG'.'.none');" 2>/dev/null; php -r "
+            WP_DB=$(php -r "
               \$s = file_get_contents('$WP_CFG');
               preg_match(\"/DB_NAME',\s*'([^']+)'/\", \$s, \$m); echo \$m[1];
             ")
@@ -75,7 +76,11 @@ jobs:
               preg_match(\"/DB_PASSWORD',\s*'([^']+)'/\", \$s, \$m); echo \$m[1];
             ")
             echo "WordPress DB name resolved: $([ -n "$WP_DB" ] && echo yes || echo NO)"
-            mysqldump -u"$WP_USER" -p"$WP_PASS" "$WP_DB" > "$WORK/wp.sql"
+            if [ -z "$WP_DB" ] || [ -z "$WP_USER" ] || [ -z "$WP_PASS" ]; then
+              echo "FATAL: could not extract WordPress DB credentials from wp-config.php" >&2
+              exit 1
+            fi
+            MYSQL_PWD="$WP_PASS" timeout 60 mysqldump --connect-timeout=10 -u"$WP_USER" "$WP_DB" > "$WORK/wp.sql"
             echo "WordPress DB dumped: $(wc -l < "$WORK/wp.sql") lines"
 
             tar czf "$WORK/uploads.tar.gz" -C /var/www/html/wordpress/wp-content uploads
@@ -99,9 +104,11 @@ jobs:
             CRM_USER=$(echo "$CRM_URL" | sed -E 's#.*//([^:]+):.*#\1#')
             CRM_PASS=$(echo "$CRM_URL" | sed -E 's#.*//[^:]+:([^@]+)@.*#\1#')
             echo "CRM DB name resolved: $([ -n "$CRM_DB" ] && echo yes || echo NO)"
-            if [ -n "$CRM_DB" ]; then
-              mysqldump -u"$CRM_USER" -p"$CRM_PASS" "$CRM_DB" > "$WORK/crm.sql" 2>/dev/null || echo "CRM dump failed - will check manually"
+            if [ -n "$CRM_DB" ] && [ -n "$CRM_USER" ] && [ -n "$CRM_PASS" ]; then
+              MYSQL_PWD="$CRM_PASS" timeout 60 mysqldump --connect-timeout=10 -u"$CRM_USER" "$CRM_DB" > "$WORK/crm.sql" 2>/tmp/crm_dump_err.log || echo "CRM dump failed: $(cat /tmp/crm_dump_err.log)"
               echo "CRM DB dumped: $(wc -l < "$WORK/crm.sql" 2>/dev/null || echo 0) lines"
+            else
+              echo "CRM DB credentials not resolved from frontend env - skipping CRM dump"
             fi
 
             tar czf /tmp/chillo_migrate.tar.gz -C /tmp chillo_migrate
@@ -109,21 +116,24 @@ jobs:
           REMOTE
 
       - name: Download package from VPS
+        timeout-minutes: 5
         run: |
-          scp -i ~/.ssh/vps_key -o StrictHostKeyChecking=accept-new "$VPS_USER@$VPS_HOST:/tmp/chillo_migrate.tar.gz" ./chillo_migrate.tar.gz
+          scp -i ~/.ssh/vps_key -o StrictHostKeyChecking=accept-new -o ConnectTimeout=15 -o BatchMode=yes "$VPS_USER@$VPS_HOST:/tmp/chillo_migrate.tar.gz" ./chillo_migrate.tar.gz
           ls -lh chillo_migrate.tar.gz
 
       - name: Upload package to cPanel
+        timeout-minutes: 5
         run: |
-          scp -i ~/.ssh/cpanel_key -P "$CP_PORT" -o StrictHostKeyChecking=accept-new ./chillo_migrate.tar.gz "$CP_USER@$CP_HOST:~/chillo_migrate.tar.gz"
+          scp -i ~/.ssh/cpanel_key -P "$CP_PORT" -o StrictHostKeyChecking=accept-new -o ConnectTimeout=15 -o BatchMode=yes ./chillo_migrate.tar.gz "$CP_USER@$CP_HOST:~/chillo_migrate.tar.gz"
 
       # ---------------------------------------------------------------
       # 2. Deploy on cPanel: import DBs, lay out files, configure the
       #    Node.js app. Reuses the existing "chillo"/"chillocrm" DBs.
       # ---------------------------------------------------------------
       - name: Deploy on cPanel
+        timeout-minutes: 8
         run: |
-          ssh -i ~/.ssh/cpanel_key -p "$CP_PORT" -o StrictHostKeyChecking=accept-new "$CP_USER@$CP_HOST" 'bash -s' <<'REMOTE'
+          ssh -i ~/.ssh/cpanel_key -p "$CP_PORT" -o StrictHostKeyChecking=accept-new -o ConnectTimeout=15 -o BatchMode=yes "$CP_USER@$CP_HOST" 'bash -s' <<'REMOTE'
             set -e
             CPUSER=$(whoami)
             WP_DB="${CPUSER}_chillo"
@@ -149,12 +159,16 @@ jobs:
             echo "CRM db user password set: yes"
 
             if [ -s ~/migrate_incoming/wp.sql ]; then
-              mysql -u"$WP_DBUSER" -p"$WP_DBPASS" "$WP_DB" < ~/migrate_incoming/wp.sql
+              MYSQL_PWD="$WP_DBPASS" timeout 120 mysql --connect-timeout=10 -u"$WP_DBUSER" "$WP_DB" < ~/migrate_incoming/wp.sql
               echo "WordPress DB imported"
+            else
+              echo "no wp.sql to import"
             fi
             if [ -s ~/migrate_incoming/crm.sql ]; then
-              mysql -u"$CRM_DBUSER" -p"$CRM_DBPASS" "$CRM_DB" < ~/migrate_incoming/crm.sql
+              MYSQL_PWD="$CRM_DBPASS" timeout 120 mysql --connect-timeout=10 -u"$CRM_DBUSER" "$CRM_DB" < ~/migrate_incoming/crm.sql
               echo "CRM DB imported"
+            else
+              echo "no crm.sql to import"
             fi
 
             if [ -d ~/chillocreative-src/.git ]; then
@@ -210,7 +224,8 @@ jobs:
 
       - name: Cleanup transferred package (local runner + both remotes)
         if: always()
+        timeout-minutes: 2
         run: |
           rm -f chillo_migrate.tar.gz
-          ssh -i ~/.ssh/vps_key -o StrictHostKeyChecking=accept-new "$VPS_USER@$VPS_HOST" 'rm -f /tmp/chillo_migrate.tar.gz; rm -rf /tmp/chillo_migrate' || true
-          ssh -i ~/.ssh/cpanel_key -p "$CP_PORT" -o StrictHostKeyChecking=accept-new "$CP_USER@$CP_HOST" 'rm -f ~/chillo_migrate.tar.gz; rm -rf ~/migrate_incoming' || true
+          ssh -i ~/.ssh/vps_key -o StrictHostKeyChecking=accept-new -o ConnectTimeout=15 -o BatchMode=yes "$VPS_USER@$VPS_HOST" 'rm -f /tmp/chillo_migrate.tar.gz; rm -rf /tmp/chillo_migrate' || true
+          ssh -i ~/.ssh/cpanel_key -p "$CP_PORT" -o StrictHostKeyChecking=accept-new -o ConnectTimeout=15 -o BatchMode=yes "$CP_USER@$CP_HOST" 'rm -f ~/chillo_migrate.tar.gz; rm -rf ~/migrate_incoming' || true
