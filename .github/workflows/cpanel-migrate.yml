@@ -81,7 +81,7 @@ jobs:
               echo "FATAL: could not extract WordPress DB credentials from wp-config.php" >&2
               exit 1
             fi
-            MYSQL_PWD="$WP_PASS" timeout 60 mysqldump -u"$WP_USER" "$WP_DB" > "$WORK/wp.sql"
+            MYSQL_PWD="$WP_PASS" timeout 60 mysqldump --no-tablespaces --single-transaction --skip-lock-tables -u"$WP_USER" "$WP_DB" > "$WORK/wp.sql"
             echo "WordPress DB dumped: $(wc -l < "$WORK/wp.sql") lines"
 
             tar czf "$WORK/uploads.tar.gz" -C /var/www/html/wordpress/wp-content uploads
@@ -101,12 +101,16 @@ jobs:
             fi
 
             CRM_URL=$(grep -oE 'DATABASE_URL=.*' "$WORK/frontend.env" | head -1)
-            CRM_DB=$(echo "$CRM_URL" | sed -E 's#.*/([^/?]+).*#\1#')
+            # Passwords can contain '@' (seen elsewhere in this project's
+            # generated credentials), so match against the LAST '@' as the
+            # user:pass/host separator, not the first - a naive [^@]+
+            # capture truncates any password containing one.
+            CRM_DB=$(echo "$CRM_URL" | sed -E 's#.*/([^/?"]+).*#\1#')
             CRM_USER=$(echo "$CRM_URL" | sed -E 's#.*//([^:]+):.*#\1#')
-            CRM_PASS=$(echo "$CRM_URL" | sed -E 's#.*//[^:]+:([^@]+)@.*#\1#')
+            CRM_PASS=$(echo "$CRM_URL" | sed -E 's#.*//[^:]+:(.*)@[^@]+$#\1#')
             echo "CRM DB name resolved: $([ -n "$CRM_DB" ] && echo yes || echo NO)"
             if [ -n "$CRM_DB" ] && [ -n "$CRM_USER" ] && [ -n "$CRM_PASS" ]; then
-              MYSQL_PWD="$CRM_PASS" timeout 60 mysqldump -u"$CRM_USER" "$CRM_DB" > "$WORK/crm.sql" 2>/tmp/crm_dump_err.log || echo "CRM dump failed: $(cat /tmp/crm_dump_err.log)"
+              MYSQL_PWD="$CRM_PASS" timeout 60 mysqldump --no-tablespaces --single-transaction --skip-lock-tables -u"$CRM_USER" "$CRM_DB" > "$WORK/crm.sql" 2>/tmp/crm_dump_err.log || echo "CRM dump failed: $(cat /tmp/crm_dump_err.log)"
               echo "CRM DB dumped: $(wc -l < "$WORK/crm.sql" 2>/dev/null || echo 0) lines"
             else
               echo "CRM DB credentials not resolved from frontend env - skipping CRM dump"
@@ -179,9 +183,11 @@ jobs:
             fi
             echo "source checked out"
 
+            # rsync isn't installed on this account - plain cp is fine since
+            # the excluded paths (wp-content/uploads, wp-config.php) are
+            # gitignored and simply don't exist in a fresh clone anyway.
             mkdir -p ~/public_html/wordpress
-            rsync -a --exclude 'wp-content/uploads' --exclude 'wp-config.php' \
-              ~/chillocreative-src/wordpress/ ~/public_html/wordpress/
+            cp -a ~/chillocreative-src/wordpress/. ~/public_html/wordpress/
             mkdir -p ~/public_html/wordpress/wp-content
             tar xzf ~/migrate_incoming/uploads.tar.gz -C ~/public_html/wordpress/wp-content/
             echo "WordPress files laid out"
@@ -206,8 +212,7 @@ jobs:
             } > ~/public_html/wordpress/wp-config.php
             echo "wp-config.php written"
 
-            rsync -a --exclude 'node_modules' --exclude '.next' --exclude '.env*' \
-              ~/chillocreative-src/frontend/ ~/public_html/app/
+            cp -a ~/chillocreative-src/frontend/. ~/public_html/app/
             echo "frontend files laid out"
 
             CRM_URL_NEW="mysql://${CRM_DBUSER}:${CRM_DBPASS}@localhost:3306/${CRM_DB}"
