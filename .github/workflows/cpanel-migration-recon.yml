@@ -1,0 +1,87 @@
+name: cPanel Migration - Recon (read-only)
+
+# Manual, read-only discovery pass before the real VPS -> cPanel migration.
+# Does not modify anything on the VPS, cPanel, or Cloudflare. Never prints
+# passwords or key material - only structure/inventory info.
+
+on:
+  workflow_dispatch:
+
+jobs:
+  recon:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/vps_key
+          printf '%s\n' "${{ secrets.CPANEL_SSH_KEY }}" > ~/.ssh/cpanel_key
+          chmod 600 ~/.ssh/vps_key ~/.ssh/cpanel_key
+          ssh-keyscan -p 22 "${{ secrets.REMOTE_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null
+          ssh-keyscan -p "${{ secrets.CPANEL_SSH_PORT }}" "${{ secrets.CPANEL_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: Recon - VPS (structure only, no secrets)
+        continue-on-error: true
+        run: |
+          ssh -i ~/.ssh/vps_key -o StrictHostKeyChecking=yes "${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}" '
+            echo "== whoami / home =="; whoami; echo $HOME
+            echo "== WordPress path =="
+            ls -la /var/www/html/wordpress 2>&1 | head -5 || echo "not found at that path"
+            echo "== wp-content/uploads size =="
+            du -sh /var/www/html/wordpress/wp-content/uploads 2>&1 || echo "n/a"
+            echo "== repo checkout present? =="
+            [ -d ~/chillocreative/.git ] && echo yes || echo no
+            echo "== frontend .env.production exists? =="
+            [ -f ~/chillocreative/frontend/.env.production ] && echo yes || echo no
+            echo "== pm2 status =="
+            pm2 list 2>&1 || echo "pm2 not found"
+            echo "== mysql client =="
+            which mysql mysqldump 2>&1
+            echo "== disk usage =="
+            df -h / 2>&1
+            echo "== nginx sites for chillocreative =="
+            grep -l chillocreative /etc/nginx/conf.d/*.conf /etc/nginx/sites-enabled/* 2>/dev/null || echo "not found by grep"
+          '
+
+      - name: Recon - cPanel (structure only, no secrets)
+        continue-on-error: true
+        run: |
+          ssh -i ~/.ssh/cpanel_key -p "${{ secrets.CPANEL_SSH_PORT }}" -o StrictHostKeyChecking=yes "${{ secrets.CPANEL_USER }}@${{ secrets.CPANEL_HOST }}" '
+            echo "== whoami / home =="; whoami; echo $HOME
+            echo "== public_html contents (top level) =="
+            ls -la ~/public_html 2>&1 | head -30
+            echo "== public_html/wordpress exists? =="
+            [ -d ~/public_html/wordpress ] && (echo present; ls ~/public_html/wordpress | head -10) || echo "not present"
+            echo "== public_html/frontend exists? =="
+            [ -d ~/public_html/frontend ] && (echo present; ls ~/public_html/frontend | head -10) || echo "not present"
+            echo "== existing MySQL databases (names only) =="
+            uapi Mysql list_databases 2>&1 | grep -i "database:" || echo "uapi not available or no output"
+            echo "== node / npm / selector tooling =="
+            which node npm 2>&1 || echo "node/npm not in default PATH"
+            command -v cloudlinux-selector 2>&1 || ls /usr/sbin/cloudlinux-selector 2>&1 || echo "no cloudlinux-selector found"
+            echo "== existing git checkouts under home =="
+            find ~ -maxdepth 3 -iname ".git" -type d 2>&1
+            echo "== server public IP =="
+            curl -s --max-time 5 ifconfig.me; echo
+            echo "== disk quota / usage =="
+            quota -s 2>&1 || df -h ~ 2>&1
+            echo "== PHP version =="
+            php -v 2>&1 | head -1
+            echo "== WP-CLI available? =="
+            which wp 2>&1 || echo "no wp-cli"
+          '
+
+      - name: Recon - Cloudflare DNS (read-only, public info)
+        continue-on-error: true
+        run: |
+          echo "== A/CNAME records for chillocreative.com (apex) =="
+          curl -s -X GET "https://api.cloudflare.com/client/v4/zones/${{ secrets.CLOUDFLARE_ZONE_ID }}/dns_records?name=chillocreative.com" \
+            -H "Authorization: Bearer ${{ secrets.CLOUDFLARE_API_TOKEN }}" \
+            -H "Content-Type: application/json" | python3 -m json.tool
+          echo "== A/CNAME records for www.chillocreative.com =="
+          curl -s -X GET "https://api.cloudflare.com/client/v4/zones/${{ secrets.CLOUDFLARE_ZONE_ID }}/dns_records?name=www.chillocreative.com" \
+            -H "Authorization: Bearer ${{ secrets.CLOUDFLARE_API_TOKEN }}" \
+            -H "Content-Type: application/json" | python3 -m json.tool
+
+      - name: Done
+        run: echo "Recon complete - review the three sections above before Stage 2 (migration) is written."
