@@ -126,8 +126,14 @@ jobs:
             find ~/public_html/app -maxdepth 3 2>&1
             echo "== full MySQL database list with sizes =="
             uapi Mysql list_databases 2>&1
-            echo "== cloudlinux Node.js apps already configured =="
+            echo "== cloudlinux Node.js apps already configured (attempt 1) =="
             /usr/sbin/cloudlinux-selector list --json --interpreter nodejs 2>&1
+            echo "== cloudlinux Node.js apps already configured (attempt 2, no interpreter filter) =="
+            /usr/sbin/cloudlinux-selector list --json 2>&1
+            echo "== public_html/.htaccess =="
+            cat ~/public_html/.htaccess 2>&1
+            echo "== public_html/app/.htaccess =="
+            cat ~/public_html/app/.htaccess 2>&1
           '
 
       - name: Recon - Cloudflare DNS (read-only, public info)
