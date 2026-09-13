@@ -40,6 +40,21 @@ jobs:
           echo "CP_USER length: ${#CP_USER}"
           echo "CP_PORT value (not secret): '${CP_PORT}'"
 
+      - name: Diagnose cpanel_key file (safe - no private content printed)
+        run: |
+          echo "-- first line (standard PEM header text, not secret) --"
+          head -n1 ~/.ssh/cpanel_key
+          echo "-- last line (standard PEM footer text, not secret) --"
+          tail -n1 ~/.ssh/cpanel_key
+          echo "-- line count --"
+          wc -l < ~/.ssh/cpanel_key
+          echo "-- literal backslash-n occurrences (should be 0; >0 means newlines got flattened when pasted) --"
+          grep -o '\\n' ~/.ssh/cpanel_key | wc -l
+          echo "-- byte count --"
+          wc -c < ~/.ssh/cpanel_key
+          echo "-- deriving public key from it (public data only, safe to print) --"
+          ssh-keygen -y -f ~/.ssh/cpanel_key -P "" || echo "ssh-keygen could not parse this as a private key"
+
       - name: known_hosts
         continue-on-error: true
         run: |
