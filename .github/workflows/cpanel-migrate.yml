@@ -1,0 +1,216 @@
+name: cPanel Migration - Stage 2 (execute)
+
+# Actually migrates chillocreative.com (main domain only - no subdomains)
+# from the DigitalOcean VPS to the existing cPanel account.
+# - WordPress -> public_html/wordpress (new)
+# - Next.js frontend -> public_html/app (existing Node.js Selector app root)
+# - Reuses the existing "chillo" and "chillocrm" databases already on cPanel
+# - Never touches any other domain/database on the shared cPanel account
+# - Does not touch DNS - that is a separate, later step once this is verified
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type MIGRATE to run'
+        required: true
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Guard
+        run: |
+          if [ "${{ github.event.inputs.confirm }}" != "MIGRATE" ]; then
+            echo "Confirmation text did not match MIGRATE. Aborting."
+            exit 1
+          fi
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/vps_key
+          printf '%s\n' "${{ secrets.CPANEL_SSH_KEY }}" > ~/.ssh/cpanel_key
+          chmod 600 ~/.ssh/vps_key ~/.ssh/cpanel_key
+          clean() { printf '%s' "$1" | tr -d '\r\n' | xargs; }
+          {
+            echo "VPS_HOST=$(clean "${{ secrets.REMOTE_HOST }}")"
+            echo "VPS_USER=$(clean "${{ secrets.REMOTE_USER }}")"
+            echo "CP_HOST=$(clean "${{ secrets.CPANEL_HOST }}")"
+            echo "CP_USER=$(clean "${{ secrets.CPANEL_USER }}")"
+            echo "CP_PORT=$(clean "${{ secrets.CPANEL_SSH_PORT }}")"
+          } >> "$GITHUB_ENV"
+
+      - name: known_hosts
+        run: |
+          ssh-keyscan -p 22 "$VPS_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+          ssh-keyscan -p "$CP_PORT" "$CP_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+
+      # ---------------------------------------------------------------
+      # 1. Package everything we need from the live VPS. All credential
+      #    extraction happens INSIDE this one remote shell and is never
+      #    echoed - only non-secret progress lines are printed.
+      # ---------------------------------------------------------------
+      - name: Package data on VPS
+        run: |
+          ssh -i ~/.ssh/vps_key -o StrictHostKeyChecking=accept-new "$VPS_USER@$VPS_HOST" 'bash -s' <<'REMOTE'
+            set -e
+            WORK=/tmp/chillo_migrate
+            rm -rf "$WORK"; mkdir -p "$WORK"
+
+            WP_CFG=/var/www/html/wordpress/wp-config.php
+            WP_DB=$(php -r "define('ABSPATH','/tmp/');include('$WP_CFG'.'.none');" 2>/dev/null; php -r "
+              \$s = file_get_contents('$WP_CFG');
+              preg_match(\"/DB_NAME',\s*'([^']+)'/\", \$s, \$m); echo \$m[1];
+            ")
+            WP_USER=$(php -r "
+              \$s = file_get_contents('$WP_CFG');
+              preg_match(\"/DB_USER',\s*'([^']+)'/\", \$s, \$m); echo \$m[1];
+            ")
+            WP_PASS=$(php -r "
+              \$s = file_get_contents('$WP_CFG');
+              preg_match(\"/DB_PASSWORD',\s*'([^']+)'/\", \$s, \$m); echo \$m[1];
+            ")
+            echo "WordPress DB name resolved: $([ -n "$WP_DB" ] && echo yes || echo NO)"
+            mysqldump -u"$WP_USER" -p"$WP_PASS" "$WP_DB" > "$WORK/wp.sql"
+            echo "WordPress DB dumped: $(wc -l < "$WORK/wp.sql") lines"
+
+            tar czf "$WORK/uploads.tar.gz" -C /var/www/html/wordpress/wp-content uploads
+            echo "uploads packaged: $(du -sh "$WORK/uploads.tar.gz" | cut -f1)"
+
+            FRONT=~/chillocreative/frontend
+            ENVFILE=""
+            for f in "$FRONT"/.env.production "$FRONT"/.env; do
+              [ -f "$f" ] && ENVFILE="$f" && break
+            done
+            if [ -n "$ENVFILE" ]; then
+              cp "$ENVFILE" "$WORK/frontend.env"
+              echo "frontend env source: file ($(basename "$ENVFILE"))"
+            else
+              pm2 env 0 2>/dev/null | grep -E '^[A-Z_]+: ' | sed -E 's/^([A-Z_]+): /\1=/' > "$WORK/frontend.env" || true
+              echo "frontend env source: pm2 env fallback ($(wc -l < "$WORK/frontend.env") vars)"
+            fi
+
+            CRM_URL=$(grep -oE 'DATABASE_URL=.*' "$WORK/frontend.env" | head -1)
+            CRM_DB=$(echo "$CRM_URL" | sed -E 's#.*/([^/?]+).*#\1#')
+            CRM_USER=$(echo "$CRM_URL" | sed -E 's#.*//([^:]+):.*#\1#')
+            CRM_PASS=$(echo "$CRM_URL" | sed -E 's#.*//[^:]+:([^@]+)@.*#\1#')
+            echo "CRM DB name resolved: $([ -n "$CRM_DB" ] && echo yes || echo NO)"
+            if [ -n "$CRM_DB" ]; then
+              mysqldump -u"$CRM_USER" -p"$CRM_PASS" "$CRM_DB" > "$WORK/crm.sql" 2>/dev/null || echo "CRM dump failed - will check manually"
+              echo "CRM DB dumped: $(wc -l < "$WORK/crm.sql" 2>/dev/null || echo 0) lines"
+            fi
+
+            tar czf /tmp/chillo_migrate.tar.gz -C /tmp chillo_migrate
+            echo "PACKAGE_READY $(du -sh /tmp/chillo_migrate.tar.gz | cut -f1)"
+          REMOTE
+
+      - name: Download package from VPS
+        run: |
+          scp -i ~/.ssh/vps_key -o StrictHostKeyChecking=accept-new "$VPS_USER@$VPS_HOST:/tmp/chillo_migrate.tar.gz" ./chillo_migrate.tar.gz
+          ls -lh chillo_migrate.tar.gz
+
+      - name: Upload package to cPanel
+        run: |
+          scp -i ~/.ssh/cpanel_key -P "$CP_PORT" -o StrictHostKeyChecking=accept-new ./chillo_migrate.tar.gz "$CP_USER@$CP_HOST:~/chillo_migrate.tar.gz"
+
+      # ---------------------------------------------------------------
+      # 2. Deploy on cPanel: import DBs, lay out files, configure the
+      #    Node.js app. Reuses the existing "chillo"/"chillocrm" DBs.
+      # ---------------------------------------------------------------
+      - name: Deploy on cPanel
+        run: |
+          ssh -i ~/.ssh/cpanel_key -p "$CP_PORT" -o StrictHostKeyChecking=accept-new "$CP_USER@$CP_HOST" 'bash -s' <<'REMOTE'
+            set -e
+            CPUSER=$(whoami)
+            WP_DB="${CPUSER}_chillo"
+            CRM_DB="${CPUSER}_chillocrm"
+            WP_DBUSER="${CPUSER}_chillo"
+            CRM_DBUSER="${CPUSER}_chillocrm"
+
+            mkdir -p ~/migrate_incoming
+            tar xzf ~/chillo_migrate.tar.gz -C ~/migrate_incoming --strip-components=1
+
+            # Generate strong random passwords locally, never printed.
+            WP_DBPASS=$(openssl rand -base64 24 | tr -dc 'A-Za-z0-9')
+            CRM_DBPASS=$(openssl rand -base64 24 | tr -dc 'A-Za-z0-9')
+
+            uapi Mysql set_password user="$WP_DBUSER" password="$WP_DBPASS" >/dev/null 2>&1 || \
+              uapi Mysql create_user name="$WP_DBUSER" password="$WP_DBPASS" >/dev/null 2>&1
+            uapi Mysql set_privileges_on_user user="$WP_DBUSER" database="$WP_DB" privileges="ALL PRIVILEGES" >/dev/null 2>&1
+            echo "WP db user password set: yes"
+
+            uapi Mysql set_password user="$CRM_DBUSER" password="$CRM_DBPASS" >/dev/null 2>&1 || \
+              uapi Mysql create_user name="$CRM_DBUSER" password="$CRM_DBPASS" >/dev/null 2>&1
+            uapi Mysql set_privileges_on_user user="$CRM_DBUSER" database="$CRM_DB" privileges="ALL PRIVILEGES" >/dev/null 2>&1
+            echo "CRM db user password set: yes"
+
+            if [ -s ~/migrate_incoming/wp.sql ]; then
+              mysql -u"$WP_DBUSER" -p"$WP_DBPASS" "$WP_DB" < ~/migrate_incoming/wp.sql
+              echo "WordPress DB imported"
+            fi
+            if [ -s ~/migrate_incoming/crm.sql ]; then
+              mysql -u"$CRM_DBUSER" -p"$CRM_DBPASS" "$CRM_DB" < ~/migrate_incoming/crm.sql
+              echo "CRM DB imported"
+            fi
+
+            if [ -d ~/chillocreative-src/.git ]; then
+              git -C ~/chillocreative-src pull --quiet origin main
+            else
+              git clone --quiet --depth 1 https://github.com/chillocreative/chillocreative.git ~/chillocreative-src
+            fi
+            echo "source checked out"
+
+            mkdir -p ~/public_html/wordpress
+            rsync -a --exclude 'wp-content/uploads' --exclude 'wp-config.php' \
+              ~/chillocreative-src/wordpress/ ~/public_html/wordpress/
+            mkdir -p ~/public_html/wordpress/wp-content
+            tar xzf ~/migrate_incoming/uploads.tar.gz -C ~/public_html/wordpress/wp-content/
+            echo "WordPress files laid out"
+
+            SALTS=$(curl -s https://api.wordpress.org/secret-key/1.1/salt/)
+            {
+              echo "<?php"
+              echo "\$_SERVER['HTTPS'] = 'on';"
+              echo "define('WP_HOME', 'https://chillocreative.com/wordpress');"
+              echo "define('WP_SITEURL', 'https://chillocreative.com/wordpress');"
+              echo "define('DB_NAME', '$WP_DB');"
+              echo "define('DB_USER', '$WP_DBUSER');"
+              echo "define('DB_PASSWORD', '$WP_DBPASS');"
+              echo "define('DB_HOST', 'localhost');"
+              echo "define('DB_CHARSET', 'utf8mb4');"
+              echo "define('DB_COLLATE', '');"
+              echo "$SALTS"
+              echo "\$table_prefix = 'wp_';"
+              echo "define('WP_DEBUG', false);"
+              echo "if (!defined('ABSPATH')) { define('ABSPATH', __DIR__ . '/'); }"
+              echo "require_once ABSPATH . 'wp-settings.php';"
+            } > ~/public_html/wordpress/wp-config.php
+            echo "wp-config.php written"
+
+            rsync -a --exclude 'node_modules' --exclude '.next' --exclude '.env*' \
+              ~/chillocreative-src/frontend/ ~/public_html/app/
+            echo "frontend files laid out"
+
+            CRM_URL_NEW="mysql://${CRM_DBUSER}:${CRM_DBPASS}@localhost:3306/${CRM_DB}"
+            JWT_LINE=$(grep -E '^JWT_SECRET=' ~/migrate_incoming/frontend.env 2>/dev/null || echo "JWT_SECRET=$(openssl rand -hex 32)")
+            {
+              echo "DATABASE_URL=\"$CRM_URL_NEW\""
+              echo "$JWT_LINE"
+              echo "NEXT_PUBLIC_WORDPRESS_API_URL=\"https://chillocreative.com/wordpress/graphql\""
+            } > ~/public_html/app/.env.production
+            echo "frontend .env.production written"
+
+            echo "== node interpreter options =="
+            /usr/sbin/cloudlinux-selector interpreters --json --interpreter nodejs 2>&1 || echo "(could not list interpreters)"
+          REMOTE
+
+      - name: Cleanup transferred package (local runner + both remotes)
+        if: always()
+        run: |
+          rm -f chillo_migrate.tar.gz
+          ssh -i ~/.ssh/vps_key -o StrictHostKeyChecking=accept-new "$VPS_USER@$VPS_HOST" 'rm -f /tmp/chillo_migrate.tar.gz; rm -rf /tmp/chillo_migrate' || true
+          ssh -i ~/.ssh/cpanel_key -p "$CP_PORT" -o StrictHostKeyChecking=accept-new "$CP_USER@$CP_HOST" 'rm -f ~/chillo_migrate.tar.gz; rm -rf ~/migrate_incoming' || true
