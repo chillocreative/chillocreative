@@ -17,13 +17,39 @@ jobs:
           printf '%s\n' "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/vps_key
           printf '%s\n' "${{ secrets.CPANEL_SSH_KEY }}" > ~/.ssh/cpanel_key
           chmod 600 ~/.ssh/vps_key ~/.ssh/cpanel_key
-          ssh-keyscan -p 22 "${{ secrets.REMOTE_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null
-          ssh-keyscan -p "${{ secrets.CPANEL_SSH_PORT }}" "${{ secrets.CPANEL_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null
+
+          # Secrets pasted via a browser sometimes carry a trailing CR/LF or
+          # stray whitespace, which OpenSSH rejects outright as an "invalid
+          # character" in a hostname/username. Strip that defensively and
+          # pass everything along via GITHUB_ENV instead of re-interpolating
+          # the raw secrets context in every subsequent step.
+          clean() { printf '%s' "$1" | tr -d '\r\n' | xargs; }
+          {
+            echo "VPS_HOST=$(clean "${{ secrets.REMOTE_HOST }}")"
+            echo "VPS_USER=$(clean "${{ secrets.REMOTE_USER }}")"
+            echo "CP_HOST=$(clean "${{ secrets.CPANEL_HOST }}")"
+            echo "CP_USER=$(clean "${{ secrets.CPANEL_USER }}")"
+            echo "CP_PORT=$(clean "${{ secrets.CPANEL_SSH_PORT }}")"
+          } >> "$GITHUB_ENV"
+
+      - name: Sanity-check secret shapes (lengths only, never values)
+        run: |
+          echo "VPS_HOST length: ${#VPS_HOST}"
+          echo "VPS_USER length: ${#VPS_USER}"
+          echo "CP_HOST length: ${#CP_HOST}"
+          echo "CP_USER length: ${#CP_USER}"
+          echo "CP_PORT value (not secret): '${CP_PORT}'"
+
+      - name: known_hosts
+        continue-on-error: true
+        run: |
+          ssh-keyscan -p 22 "$VPS_HOST" >> ~/.ssh/known_hosts 2>&1 | tail -5
+          ssh-keyscan -p "$CP_PORT" "$CP_HOST" >> ~/.ssh/known_hosts 2>&1 | tail -5
 
       - name: Recon - VPS (structure only, no secrets)
         continue-on-error: true
         run: |
-          ssh -i ~/.ssh/vps_key -o StrictHostKeyChecking=yes "${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}" '
+          ssh -v -i ~/.ssh/vps_key -o StrictHostKeyChecking=accept-new -o ConnectTimeout=10 "$VPS_USER@$VPS_HOST" '
             echo "== whoami / home =="; whoami; echo $HOME
             echo "== WordPress path =="
             ls -la /var/www/html/wordpress 2>&1 | head -5 || echo "not found at that path"
@@ -46,7 +72,7 @@ jobs:
       - name: Recon - cPanel (structure only, no secrets)
         continue-on-error: true
         run: |
-          ssh -i ~/.ssh/cpanel_key -p "${{ secrets.CPANEL_SSH_PORT }}" -o StrictHostKeyChecking=yes "${{ secrets.CPANEL_USER }}@${{ secrets.CPANEL_HOST }}" '
+          ssh -v -i ~/.ssh/cpanel_key -p "$CP_PORT" -o StrictHostKeyChecking=accept-new -o ConnectTimeout=10 "$CP_USER@$CP_HOST" '
             echo "== whoami / home =="; whoami; echo $HOME
             echo "== public_html contents (top level) =="
             ls -la ~/public_html 2>&1 | head -30
