@@ -107,11 +107,18 @@ jobs:
             CRM_USER=$(echo "$CRM_URL" | sed -E 's#.*//([^:]+):.*#\1#')
             CRM_PASS=$(echo "$CRM_URL" | sed -E 's#.*//[^:]+:(.*)@[^@]+$#\1#')
             echo "CRM DB name resolved: $([ -n "$CRM_DB" ] && echo yes || echo NO)"
-            echo "CRM_URL '@' count (safe, structural only): $(echo "$CRM_URL" | grep -o '@' | wc -l)"
-            echo "CRM_USER length: ${#CRM_USER}"
-            echo "CRM_PASS length: ${#CRM_PASS}"
-            echo "CRM_DB value length: ${#CRM_DB}"
-            if [ -n "$CRM_DB" ] && [ -n "$CRM_USER" ] && [ -n "$CRM_PASS" ]; then
+            echo "CRM_USER length: ${#CRM_USER} (4 strongly suggests 'root')"
+            if [ -z "$CRM_DB" ]; then
+              echo "CRM DB name not resolved from frontend env - skipping CRM dump"
+            elif [ "$CRM_USER" = "root" ] && [ "$(whoami)" = "root" ]; then
+              # Ubuntu's MySQL root account normally uses the auth_socket
+              # plugin, not password auth - any -p value is rejected even
+              # if it's the "correct" application-level password. Since
+              # this SSH session already runs as OS root, connect via the
+              # local socket with no explicit user/password at all.
+              timeout 60 mysqldump --no-tablespaces --single-transaction --skip-lock-tables "$CRM_DB" > "$WORK/crm.sql" 2>/tmp/crm_dump_err.log || echo "CRM dump failed: $(cat /tmp/crm_dump_err.log)"
+              echo "CRM DB dumped (root socket auth): $(wc -l < "$WORK/crm.sql" 2>/dev/null || echo 0) lines"
+            elif [ -n "$CRM_USER" ] && [ -n "$CRM_PASS" ]; then
               MYSQL_PWD="$CRM_PASS" timeout 60 mysqldump --no-tablespaces --single-transaction --skip-lock-tables -u"$CRM_USER" "$CRM_DB" > "$WORK/crm.sql" 2>/tmp/crm_dump_err.log || echo "CRM dump failed: $(cat /tmp/crm_dump_err.log)"
               echo "CRM DB dumped: $(wc -l < "$WORK/crm.sql" 2>/dev/null || echo 0) lines"
             else
